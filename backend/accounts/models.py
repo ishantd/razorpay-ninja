@@ -106,6 +106,8 @@ class Profile(models.Model):
     email_verified = models.BooleanField(default=False, null=False)
     profile_progress = models.IntegerField(choices=PROGRESS_CHOICES, default=1, null=True)
     profile_complete= models.BooleanField(default=False, null=False)
+    razorpay_fund_account_id = models.CharField(max_length=255, null=True, blank=True)
+    razorpay_contact_id = models.CharField(max_length=255, null=True, blank=True)
     
     def __str__(self):
         return self.user_id.username

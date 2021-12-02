@@ -41,6 +41,8 @@ EMAIL_CONFIG = get_env_var("EMAIL")
 
 GOOGLE = get_env_var("GOOGLE")
 
+RAZORPAY = get_env_var("razorpay")
+
 DB_CONFIG = get_env_var("DB")
 
 AWS = get_env_var("AWS")
@@ -228,3 +230,11 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+RAZORPAY_X_KEY = RAZORPAY["x"]["key"]
+RAZORPAY_X_SECRET = RAZORPAY["x"]["secret"]
+
+RAZORPAY_KEY = RAZORPAY["normal"]["key"]
+RAZORPAY_SECRET = RAZORPAY["normal"]["secret"]
+
+RAZORPAY_ACCOUNT_NUMBER = RAZORPAY["account"]
