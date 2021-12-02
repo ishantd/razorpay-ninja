@@ -235,7 +235,6 @@ class UpdateAndVerifyBankAccount(APIView):
                 user_bank_account.verified = True
                 user_bank_account.verified_timestamp = datetime.now()
                 user_bank_account.save()
-                profile = Profile.objects.get(user_id=request.user)
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
         return JsonResponse({"status": "bad input"}, status=400)
