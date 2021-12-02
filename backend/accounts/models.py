@@ -84,16 +84,14 @@ class Profile(models.Model):
     PROGRESS_CHOICES = (
         (1, 'OTP-Pending'),
         (2, 'OTP-Verified'),
-        (3, 'Profile-Pending'),
-        (4, 'Profile-Verified'),
-        (5, 'PAN-Pending'),
-        (6, 'PAN-Verified'),
-        (7, 'BA-Pending'),
-        (8, 'BA-Verified'),
-        (9, 'Permissions-Pending'),
-        (10, 'Permissions-Verified'),
-        (11, 'InitialMessages-Pending'),
-        (12, 'InitialMessages-Verified'),        
+        (3, 'Shop-Pending'),
+        (4, 'Shop-Verified'),
+        (5, 'Permissions-Pending'),
+        (6, 'Permissions-Verified'),
+        (7, 'InitialMessages-Pending'),
+        (8, 'InitialMessages-Verified'),
+        (9, 'UserInvite-Pending'),
+        (10, 'UserInvite-Done'),       
     )
     phone_regex = RegexValidator(regex=r'^[6-9]\d{9}$', message ="Phone number must be entered in the format: '[6,7,8,9]xxxxxxxxx'. Approx 10 digits allowed.")
     user_id            = models.OneToOneField(User, null=True, on_delete=models.CASCADE, related_name='profile')
