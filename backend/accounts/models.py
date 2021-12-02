@@ -64,7 +64,9 @@ class PanCard(models.Model):
     verified = models.BooleanField(default=False)
     verified_by_user = models.BooleanField(default=False)
     timestamp = models.DateTimeField(null=True, blank=True)
-    
+
+
+
 class UserDevice(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='device')
     device_id = models.CharField(max_length=500, null=True, blank=True)
@@ -99,6 +101,7 @@ class Profile(models.Model):
     profile_picture = models.FileField(upload_to ='profile_pictures/', null=True, blank=True)
     initial_messages_captured = models.BooleanField(default=False, null=False)
     social_login = models.BooleanField(default=False)
+    role = models.CharField(max_length=255, null=True, blank=True)
     email_verified = models.BooleanField(default=False, null=False)
     profile_progress = models.IntegerField(choices=PROGRESS_CHOICES, default=1, null=True)
     profile_complete= models.BooleanField(default=False, null=False)
@@ -112,7 +115,10 @@ def create_user_profile(sender, instance, created, **kwargs):
         print("created_profile", profile)
 post_save.connect(create_user_profile, sender=User)
 
-
+class Shop(models.Model):
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 class EmailOTP(models.Model):
     email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
     otp         = models.CharField(max_length = 9, blank = True, null= True)
