@@ -3,6 +3,8 @@ import { Text, View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Dashboard from './Components/dashboard/Dashboard'
+
 
 function HomeScreen() {
   return (
@@ -24,7 +26,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer >
       <Tab.Navigator screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
@@ -35,12 +37,20 @@ export default function App() {
             } else if (route.name === 'Settings') {
               iconName = focused ? 'ios-list' : 'ios-list';
             }
+            else if (route.name === 'Dashboard'){
+              iconName = focused ? 'book-outline' : 'book-outline';
+            }
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: 'tomato',
           tabBarInactiveTintColor: 'gray',
-        })}>
+          headerShown : false
+        })
+        }
+        
+        >
         <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Dashboard" component={Dashboard}/>
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
