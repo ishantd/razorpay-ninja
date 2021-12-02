@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
+import uuid
 
 class State(models.Model):
     unique_id = models.IntegerField(default=0)
@@ -93,8 +95,9 @@ class Profile(models.Model):
         (11, 'InitialMessages-Pending'),
         (12, 'InitialMessages-Verified'),        
     )
+    phone_regex = RegexValidator(regex=r'^[6-9]\d{9}$', message ="Phone number must be entered in the format: '[6,7,8,9]xxxxxxxxx'. Approx 10 digits allowed.")
     user_id            = models.OneToOneField(User, null=True, on_delete=models.CASCADE, related_name='profile')
-    phone       = models.CharField(max_length=10, null=True, blank=True)
+    phone       = models.CharField(validators=[phone_regex], max_length=10, null=True)
     dob = models.DateField(null=True, blank=True)
     gender          = models.CharField(max_length=7, choices=GENDER_CHOICES, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
@@ -129,10 +132,13 @@ class EmailOTP(models.Model):
         return str(self.otp) + ' is sent to ' + str(self.email)
 
 class PhoneOTP(models.Model):
-    phone   = models.CharField(max_length=100, unique=False, blank=True, null=True)
+    phone_regex = RegexValidator( regex   =r'^\+?1?\d{4,14}$', message ="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.")
+    mobile_no   = models.CharField(validators=[phone_regex], max_length=17, unique=False, blank=True, null=True)
     otp         = models.CharField(max_length = 9, blank = True, null= True)
+    count       = models.IntegerField(default = 0, help_text = 'Number of otp sent')
     validated   = models.BooleanField(default = False, help_text = 'If otp verification got successful')
     created_at  = models.DateTimeField(auto_now_add=True)
+    txn_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
         return str(self.otp) + ' is sent to ' + str(self.phone)
