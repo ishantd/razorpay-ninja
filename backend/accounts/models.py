@@ -119,6 +119,12 @@ class Shop(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    unique_code = models.CharField(max_length=255, null=True, blank=True)
+    employees = models.ManyToManyField(Profile, related_name='employees', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+
 class EmailOTP(models.Model):
     email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
     otp         = models.CharField(max_length = 9, blank = True, null= True)

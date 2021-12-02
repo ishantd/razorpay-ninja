@@ -24,4 +24,5 @@ urlpatterns = [
     # path('profile-progress/', views.OnboardingProgress.as_view(), name='profile-progress'),
     # path('api/notification/register/', views.NotificationEndpoint.as_view(), name='notification-register'),
     # path('test-data/', views.DevTestData.as_view(), name='DevTestdata')
+    path('profiles/', views.EmployeeCRUD.as_view(), name='profiles'),
 ]
