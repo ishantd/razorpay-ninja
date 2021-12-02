@@ -1,8 +1,8 @@
 import React from 'react';
-import { SafeAreaView,  FlatList, Text, View, StyleSheet } from 'react-native';
+import { SafeAreaView,  FlatList, Text, View } from 'react-native';
 import Constants from 'expo-constants'
 import {LinearGradient} from 'expo-linear-gradient';
-
+import StyleSheet from 'react-native-extended-stylesheet'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppLoading from 'expo-app-loading';
 
@@ -62,9 +62,6 @@ const Card = (props) => {
                     >
                         {props.description}
                     </Text>
-                </View>
-                <View style={classes.action}>
-
                 </View>
             </View>
             
@@ -209,8 +206,9 @@ const classes = StyleSheet.create({
         marginBottom : 10,
         zIndex : 5,
         elevation : 1,
-        paddingLeft : 40,
-        paddingRight : 70,
+        // paddingLeft : 40,
+        paddingRight : "5rem",
+        paddingBottom : "0.5rem",
         borderTopLeftRadius : 2,
         borderTopRightRadius : 2,
         borderBottomLeftRadius : 2,
@@ -220,19 +218,16 @@ const classes = StyleSheet.create({
         width : "100%",
         flexDirection : 'row',
         alignItems : 'center',
-        justifyContent : 'center',
+        justifyContent : 'space-between',
         // paddingRight : 20,
         // paddingLeft : 20
     },
     icon : {
-        fontSize : 45,
+        fontSize : "2rem",
         padding : 20,
         color : '#2649b6'
     },
-    textBox : {
-        // flex : 1
-        justifyContent : 'space-between'
-    }
+    
 });
 
 
@@ -246,7 +241,7 @@ const pageInfo = [
     {
         icon : <Ionicons name="people-outline" style={classes.icon}></Ionicons>,
         header : 'Manage your employees',
-        description : 'Manage your employees, keep track of their attendance, and see their performance.',
+        description : 'Manage your employees, keep track of their attendance, and much more.',
         page : 'Employees'
     },
     {

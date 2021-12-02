@@ -5,6 +5,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Dashboard from './Components/Dashboard'
 import Constants from 'expo-constants';
+import EStyleSheet from 'react-native-extended-stylesheet';
+
+
+EStyleSheet.build()
+
 
 function HomeScreen() {
   return (
