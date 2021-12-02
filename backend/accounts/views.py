@@ -18,6 +18,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from accounts.models import Address, Shop,Profile
 
+
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
@@ -46,6 +47,7 @@ class ShopCRU(APIView):
         except:
             return JsonResponse({"status": "shop not found"}, status=400)
         
+
         return JsonResponse({"status": "ok", "data": model_to_dict(shop)}, status=200)
 
 class EmployeeCRUD(APIView):
@@ -93,3 +95,4 @@ class EmployeeCRUD(APIView):
         profile.delete()
         return JsonResponse({"status": "ok"}, status=200)
     
+

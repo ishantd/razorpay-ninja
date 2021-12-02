@@ -125,6 +125,7 @@ class Shop(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
 
+
 class EmailOTP(models.Model):
     email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
     otp         = models.CharField(max_length = 9, blank = True, null= True)
