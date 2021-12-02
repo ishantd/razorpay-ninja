@@ -1,0 +1,25 @@
+name: CD Script
+
+# Only trigger, when the build workflow succeeded
+on:
+  # Triggers the workflow on push or pull request events but only for the main/dev branch
+  push:
+    branches: [main]
+
+
+jobs:
+  # Deploy Process
+  deploy:
+    runs-on: ubuntu-20.04 
+    steps:  
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v3.x
+
+    - name: ls -a via ssh
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        command: /home/ishant/builds/build.sh
+        host: 3.109.35.156
+        username: ishant
+        privateKey: ${{ secrets.PRIVATE_KEY}}
+
