@@ -67,8 +67,8 @@ class EmployeeCRUD(APIView):
         if(gender):
             profile.gender = gender
         if(address):
-                address_object = Address.objects.create(**address)
-                profile.address = address_object
+            address_object = Address.objects.create(**address)
+            profile.address = address_object
         profile.save()
         
         return JsonResponse({"status": "ok"}, status=200)
@@ -218,6 +218,9 @@ class UpdateAndVerifyBankAccount(APIView):
         
         account_number = request.data.get('account_number', False)
         ifsc = request.data.get('ifsc', False)
+        profile = Profile.objects.get(user_id=request.user)
+        if profile.role != 'emp':
+            return JsonResponse({"status": "user is not employee"}, status=400)
         
         if account_number and ifsc:
             bank_obj = Bank.objects.filter(ifsc=ifsc)
