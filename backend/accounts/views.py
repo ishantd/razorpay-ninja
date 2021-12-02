@@ -131,7 +131,7 @@ class SendPhoneOTP(APIView):
         if phone and valid_phone(phone):
             otp = str(otp_generator())
             if otp:
-                phone_otp = PhoneOTP.objects.create(phone=phone, otp=otp)
+                phone_otp = PhoneOTP.objects.create(mobile_no=phone, otp=otp)
                 if send_otp_to_phone(phone, otp):
                     if settings.DEBUG:
                         return JsonResponse({'status': 'Success', 'otp': otp, 'txn_id': phone_otp.txn_id}, status=200)
