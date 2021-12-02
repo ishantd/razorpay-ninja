@@ -3,6 +3,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=reactnative,django,react
 
 ### Django ###
+*.json
 *.log
 *.pot
 *.pyc
