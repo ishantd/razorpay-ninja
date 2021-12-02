@@ -3,8 +3,8 @@ import { Text, View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Dashboard from './Components/dashboard/Dashboard'
-
+import Dashboard from './Components/Dashboard'
+import Constants from 'expo-constants';
 
 function HomeScreen() {
   return (
@@ -26,6 +26,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
+    
     <NavigationContainer >
       <Tab.Navigator screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
@@ -54,13 +55,13 @@ export default function App() {
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
+    
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
