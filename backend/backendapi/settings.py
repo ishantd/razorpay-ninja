@@ -39,6 +39,8 @@ ALLOWED_HOSTS = get_env_var("ALLOWED_HOSTS")
 
 EMAIL_CONFIG = get_env_var("EMAIL")
 
+GOOGLE = get_env_var("GOOGLE")
+
 DB_CONFIG = get_env_var("DB")
 
 AWS = get_env_var("AWS")
@@ -206,6 +208,23 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id':  GOOGLE['id'],
+            'secret': GOOGLE['secret'],
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
         }
     }
 }
