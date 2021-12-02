@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  web:
+    restart: always
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/code
+    ports:
+      - 8000:8000
+    env_file:
+      - .env.dev
+    depends_on:
+      - db
+  db:
+    image: postgres:12.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=rup
+      - POSTGRES_PASSWORD=rup
+      - POSTGRES_DB=rup_dev
+  redis:
+    image: redis:latest
+    container_name: mcro_redis
+    ports:
+      - "6382:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: "bridge"
+
+volumes:
+  postgres_data:
