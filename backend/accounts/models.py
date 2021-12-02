@@ -77,14 +77,6 @@ class Profile(models.Model):
         ('Female', 'Female'),
         ('Others', 'Others'),
     )
-    MARITAL_CHOICES = (
-        ('married', 'Married'),
-        ('single', 'Single'),
-    )
-    RESIDENCE_CHOICES = (
-        ('indian', 'Indian'),
-        ('nri', 'NRI'),
-    )
     PROGRESS_CHOICES = (
         (1, 'OTP-Pending'),
         (2, 'OTP-Verified'),
@@ -103,10 +95,11 @@ class Profile(models.Model):
     phone       = models.CharField(max_length=10, null=True, blank=True)
     dob = models.DateField(null=True, blank=True)
     gender          = models.CharField(max_length=7, choices=GENDER_CHOICES, null=True, blank=True)
-    marital_status = models.CharField(max_length=10, choices=MARITAL_CHOICES, null=True, blank=True)
-    residence = models.CharField(max_length=10, choices=RESIDENCE_CHOICES, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    profile_picture = models.FileField(upload_to ='profile_pictures/', null=True, blank=True)
     initial_messages_captured = models.BooleanField(default=False, null=False)
+    social_login = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False, null=False)
     profile_progress = models.IntegerField(choices=PROGRESS_CHOICES, default=1, null=True)
     profile_complete= models.BooleanField(default=False, null=False)
     
