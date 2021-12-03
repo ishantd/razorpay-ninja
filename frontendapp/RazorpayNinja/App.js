@@ -4,8 +4,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Dashboard from './Components/Dashboard'
-import Constants from 'expo-constants';
+import GAuth from './Components/GoogleAuth'
 import EStyleSheet from 'react-native-extended-stylesheet';
+import {createStackNavigator} from '@react-navigation/stack'
+import 'react-native-gesture-handler';
+import OnBoarding1 from './Components/OnBoarding1'
+import OnBoarding2 from './Components/OnBoarding2'
+import OnBoarding3 from './Components/OnBoarding3'
+
+
 
 
 EStyleSheet.build()
@@ -27,12 +34,12 @@ function SettingsScreen() {
   );
 }
 
+const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+export  function Main() {
   return (
     
-    <NavigationContainer >
       <Tab.Navigator screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
@@ -58,11 +65,33 @@ export default function App() {
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Dashboard" component={Dashboard}/>
         <Tab.Screen name="Settings" component={SettingsScreen} />
+
       </Tab.Navigator>
-    </NavigationContainer>
     
   );
 }
+
+
+export default function App(){
+  return(
+  <NavigationContainer 
+    
+  >
+    <Stack.Navigator screenOptions={{ headerShown: false}}>
+      
+
+      <Stack.Screen name="Signup" component={GAuth}/>
+      <Stack.Screen name="OnBoarding1" component={OnBoarding1} />
+
+      <Stack.Screen name="OnBoarding2" component={OnBoarding2} />
+      <Stack.Screen name="OnBoarding3" component={OnBoarding3} />
+
+      <Stack.Screen name="Main" component={Main}/>
+    </Stack.Navigator>
+  </NavigationContainer>
+  )
+}
+
 
 const styles = StyleSheet.create({
   container: {
