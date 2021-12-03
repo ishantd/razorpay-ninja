@@ -93,9 +93,12 @@ INSTALLED_APPS = [
     # Extra Apps
     'drf_yasg',
     'corsheaders',
+    'location_field.apps.DefaultConfig',
     
     # Project Apps
     'accounts',
+    'salary',
+    'attendance',
 ]
 
 
@@ -233,6 +236,11 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'offline',
         }
     }
+}
+
+LOCATION_FIELD = {
+    'map.provider': 'openstreetmap',
+    'search.provider': 'nominatim',
 }
 
 RAZORPAY_X_KEY = RAZORPAY["x"]["key"]
