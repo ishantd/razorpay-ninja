@@ -52,7 +52,7 @@ class ShopCRU(APIView):
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
         
-        profile = Profile.objects.get(user=request.user)
+        profile = Profile.objects.get(user_id=request.user)
         if profile.role != 'owner':
             return JsonResponse({"status": "not owner"}, status=400)
         shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name)
