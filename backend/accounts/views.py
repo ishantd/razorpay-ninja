@@ -32,6 +32,7 @@ class ShopCRU(APIView):
         
         name = request.data.get('name', False)
         address = request.data.get('address', False)
+        location = request.data.get('location', False)
         
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
@@ -39,6 +40,10 @@ class ShopCRU(APIView):
         address_object = Address.objects.create(**address)
         
         shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name, address=address_object)
+        
+        if location:
+            shop.location = location
+            shop.save()
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop)}, status=200)
     
@@ -51,6 +56,29 @@ class ShopCRU(APIView):
         
 
         return JsonResponse({"status": "ok", "data": model_to_dict(shop)}, status=200)
+
+class JoinShop(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        
+        user = request.user
+        profile = Profile.objects.get(user_id = user)
+        
+        if profile.role != 'emp':
+            return JsonResponse({"status": "not emp"}, status=400)
+        
+        shop_code = request.data.get('shop_code', False)
+        if not shop_code:
+            return JsonResponse({"status": "not ok"}, status=400)
+        
+        shop = Shop.objects.filter(unique_code=shop_code)
+        
+        if not(shop.exists() or len(shop) > 1):
+            return JsonResponse({"status": "shop not found"}, status=400)
+        
+        profile.emp_in_shop = shop[0]
+        profile.save()
+        return JsonResponse({"status": "ok"}, status=200)
 
 class EmployeeCRUD(APIView):
     def post(self, request, *args, **kwargs):

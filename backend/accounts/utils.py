@@ -8,7 +8,11 @@ import requests
 email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 phone_regex = r'^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$'
 pancard_regex = "[A-Z]{5}[0-9]{4}[A-Z]{1}"
+megastring = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+
+def random_string():
+    return "".join(random.sample(megastring, 8))
 
 def create_message_string_from_otp(otp):
     return f'OTP to update your mobile number on MCRO is : {otp}'
