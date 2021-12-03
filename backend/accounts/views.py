@@ -154,11 +154,12 @@ class EmployeeCRUD(APIView):
         return JsonResponse({"status": "ok", "data":model_to_dict(prof_without_pic) }, status=200)
 
     def delete(self, request, *args, **kwargs):
-        employee_id = request.query_params.get('employee_id', False)
+        employee_id = request.query_params.get('user_id', False)
         if(employee_id==False):
-            return JsonResponse({"status": "Employee id is required"}, status=400)
-        profile = Profile.objects.get(employee_id=employee_id)
-        profile.delete()
+            return JsonResponse({"status": "User id is required"}, status=400)
+        profile = Profile.objects.get(user_id__id=employee_id)
+        profile.shop = None
+        profile.save()
         return JsonResponse({"status": "ok"}, status=200)
     
 
