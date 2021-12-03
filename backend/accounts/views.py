@@ -61,6 +61,8 @@ class ShopCRU(APIView):
             shop.address = address_object
         if location:
             shop.location = location
+        profile.emp_in_shop = shop
+        profile.save()
         shop.save()
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop)}, status=200)

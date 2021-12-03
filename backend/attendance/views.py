@@ -19,6 +19,7 @@ from drf_yasg.utils import swagger_auto_schema
 from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
+from attendance.models import Attendance
 
 import json
 import base64
@@ -26,6 +27,8 @@ import io
 from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
+
+from salary.models import Payout
 
 def decodeUserImage(data):
     try:
@@ -47,7 +50,43 @@ class CheckAttendance(APIView):
             return JsonResponse({"today": False, "in": False, "out": False}, status=200)
         return JsonResponse({'status': 'error'}, status=400)
 
-class Attendance(APIView):
+class AttendanceCRUD(APIView):
+    
+    def get(self, request, *args, **kwargs):
+        employee_id = request.query_params.get('employee_id', False)
+        user = request.user
+        profile = Profile.objects.filter(user=user)
+        shop = profile.emp_in_shop
+        if not employee_id and profile.role == 'emp':
+            return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
+        start_of_month = datetime.date.today().replace(day=1)
+        attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
+        data = {"status": "success", "attendances": []}
+        for attendance in attendances:
+            atd = {
+                attendance.date.strftime("%Y-%m-%d"): {
+                    'selectedColor': '#2CDD93'
+                    if (attendance.verified_face and attendance.verified_location)
+                    else '#FF9700',
+                    'selected': True,
+                }
+            }
+
+            data["attendances"].append(atd)
+        if not employee_id:
+            profiles = Profile.objects.filter(role='emp', shop=shop)
+            data["employee_data"] = []
+            for emp in profiles:
+                payout, payout_created = Payout.objects.get_or_create(profile=emp)
+                data["employee_data"].append({
+                    "name": f'{emp.user_id.first_name} {emp.user_id.last_name}',
+                    "user_id": emp.user_id.id,
+                    "emp_id": emp.id,
+                    "profile_photo": emp.profile_photo.url if emp.profile_photo else None,
+                    "payout": model_to_dict(payout) if not payout_created else None})
+        return JsonResponse(data, status=200)
+        
+    
     def post(self, request, *args, **kwargs):
         attendance_type = request.data.get('type', False)
         location = request.data.get('location', False)

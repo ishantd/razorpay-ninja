@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from location_field.models.plain import PlainLocationField
 from attendance.utils import ProcessAttendance
+from accounts.models import Profile, Shop
 
 def attendance_selfie_path(instance):
 
@@ -10,6 +11,7 @@ def attendance_selfie_path(instance):
 
 class Attendance(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, null=True, blank=True, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     attendance_time_in = models.DateTimeField(default=timezone.now)
     attendance_time_out = models.DateTimeField(null=True, blank=True)
