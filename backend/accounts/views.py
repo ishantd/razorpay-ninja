@@ -96,6 +96,12 @@ class JoinShop(APIView):
         
         profile.emp_in_shop = shop[0]
         profile.save()
+        
+        
+        #send notification
+        
+        #verification process
+        
         return JsonResponse({"status": "ok"}, status=200)
 
 class EmployeeCRUD(APIView):
@@ -293,6 +299,9 @@ class UpdateAndVerifyBankAccount(APIView):
                 user_bank_account.save()
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
+        
+        # create razorpay accounts
+        
         return JsonResponse({"status": "bad input"}, status=400)
     
     def get(self, request, *args, **kwargs):
