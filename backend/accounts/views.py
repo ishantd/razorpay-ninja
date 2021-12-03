@@ -286,7 +286,6 @@ class UpdateAndVerifyBankAccount(APIView):
         
         if account_number and ifsc:
             bank_obj = Bank.objects.filter(ifsc=ifsc)
-            print(bank_obj)
             if bank_obj.exists() and len(bank_obj) == 1:
                 bank_obj = Bank.objects.get(ifsc=ifsc)
                 user_bank_account, user_bank_account_created = UserBankAccount.objects.get_or_create(
