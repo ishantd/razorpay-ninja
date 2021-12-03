@@ -5,5 +5,5 @@ from attendance import views
 app_name = 'attendance'
 
 urlpatterns = [
-    path('', views.Attendance.as_view(), name='mark'),
+    path('', views.AttendanceCRUD.as_view(), name='mark'),
 ]

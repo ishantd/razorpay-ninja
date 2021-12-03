@@ -9,10 +9,10 @@ class ProcessAttendance:
         """
         Verifies the face of the employee
         """
-        pass
+        return True
     
     def verify_location(self):
         """
         Verifies the location of the employee
         """
-        pass
+        return True

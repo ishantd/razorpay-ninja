@@ -52,15 +52,17 @@ class ShopCRU(APIView):
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
         
-        profile = Profile.objects.get(user=request.user)
+        profile = Profile.objects.get(user_id=request.user)
         if profile.role != 'owner':
             return JsonResponse({"status": "not owner"}, status=400)
-        shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name)
+        shop, shop_created = Shop.objects.get_or_create(owner=profile, name=name)
         if address:
             address_object = Address.objects.create(**address)
             shop.address = address_object
         if location:
             shop.location = location
+        profile.emp_in_shop = shop
+        profile.save()
         shop.save()
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop)}, status=200)
@@ -96,6 +98,12 @@ class JoinShop(APIView):
         
         profile.emp_in_shop = shop[0]
         profile.save()
+        
+        
+        #send notification
+        
+        #verification process
+        
         return JsonResponse({"status": "ok"}, status=200)
 
 class EmployeeCRUD(APIView):
@@ -146,11 +154,12 @@ class EmployeeCRUD(APIView):
         return JsonResponse({"status": "ok", "data":model_to_dict(prof_without_pic) }, status=200)
 
     def delete(self, request, *args, **kwargs):
-        employee_id = request.query_params.get('employee_id', False)
+        employee_id = request.query_params.get('user_id', False)
         if(employee_id==False):
-            return JsonResponse({"status": "Employee id is required"}, status=400)
-        profile = Profile.objects.get(employee_id=employee_id)
-        profile.delete()
+            return JsonResponse({"status": "User id is required"}, status=400)
+        profile = Profile.objects.get(user_id__id=employee_id)
+        profile.shop = None
+        profile.save()
         return JsonResponse({"status": "ok"}, status=200)
     
 
@@ -280,7 +289,6 @@ class UpdateAndVerifyBankAccount(APIView):
         
         if account_number and ifsc:
             bank_obj = Bank.objects.filter(ifsc=ifsc)
-            print(bank_obj)
             if bank_obj.exists() and len(bank_obj) == 1:
                 bank_obj = Bank.objects.get(ifsc=ifsc)
                 user_bank_account, user_bank_account_created = UserBankAccount.objects.get_or_create(
@@ -293,6 +301,9 @@ class UpdateAndVerifyBankAccount(APIView):
                 user_bank_account.save()
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
+        
+        # create razorpay accounts
+        
         return JsonResponse({"status": "bad input"}, status=400)
     
     def get(self, request, *args, **kwargs):
