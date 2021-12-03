@@ -30,8 +30,8 @@ class ShopCRU(APIView):
     
     def post(self, request, *args, **kwargs):
         
-        name = request.POST.get('name', False)
-        address = request.POST.get('address', False)
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
         
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
@@ -55,11 +55,14 @@ class ShopCRU(APIView):
 class EmployeeCRUD(APIView):
     def post(self, request, *args, **kwargs):
                         
-        dob = request.POST.get('dob', False)
-        gender = request.POST.get('gender', False)
-        address = request.POST.get('address', False)
-        role = request.POST.get('role', False)
+        dob = request.data.get('dob', False)
+        gender = request.data.get('gender', False)
+        address = request.data.get('address', False)
+        role = request.data.get('role', False)
+        phone = request.data.get('phone', False)
         profile = Profile.objects.get(user_id = request.user)
+        if phone:
+            profile.phone = phone
         if (dob):
             profile.dob = dob
         if(role):
