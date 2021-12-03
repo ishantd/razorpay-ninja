@@ -20,6 +20,21 @@ from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAcco
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
 
+import json
+import base64
+import io
+from PIL import Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils import timezone
+
+def decodeUserImage(data):
+    try:
+        data = base64.b64decode(data.split(',')[1])
+        buf = io.BytesIO(data)
+        return Image.open(buf)
+    except Exception as e:
+        return None
+
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -37,13 +52,16 @@ class ShopCRU(APIView):
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
         
-        address_object = Address.objects.create(**address)
-        
-        shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name, address=address_object)
-        
+        profile = Profile.objects.get(user=request.user)
+        if profile.role != 'owner':
+            return JsonResponse({"status": "not owner"}, status=400)
+        shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name)
+        if address:
+            address_object = Address.objects.create(**address)
+            shop.address = address_object
         if location:
             shop.location = location
-            shop.save()
+        shop.save()
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop)}, status=200)
     
@@ -88,6 +106,7 @@ class EmployeeCRUD(APIView):
         address = request.data.get('address', False)
         role = request.data.get('role', False)
         phone = request.data.get('phone', False)
+        b64_image_string = request.data.get("profile_photo", False)
         profile = Profile.objects.get(user_id = request.user)
         if phone:
             profile.phone = phone
@@ -100,6 +119,12 @@ class EmployeeCRUD(APIView):
         if(address):
             address_object = Address.objects.create(**address)
             profile.address = address_object
+        if b64_image_string:
+            img = decodeUserImage(b64_image_string)
+            if img:
+                img_io = io.BytesIO()
+                img.save(img_io, format='PNG')
+                profile.profile_picture = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{request.user.id}.png', size=img_io.tell, charset=None)
         profile.save()
         
         return JsonResponse({"status": "ok"}, status=200)

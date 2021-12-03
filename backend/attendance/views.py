@@ -69,7 +69,7 @@ class Attendance(APIView):
                 img_io = io.BytesIO()
                 img.save(img_io, format='PNG')
                 atd = todays_attendance[0]
-                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{user.username}.png', size=img_io.tell, charset=None)
+                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{user.id}.png', size=img_io.tell, charset=None)
                 atd.attendance_time_out_location = location
                 atd.attendance_time_out = timezone.now()
                 atd.save()
