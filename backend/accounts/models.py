@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from location_field.models.plain import PlainLocationField
 import uuid
 
 class State(models.Model):
@@ -123,6 +124,7 @@ class Shop(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
     unique_code = models.CharField(max_length=255, null=True, blank=True)
+    location = PlainLocationField(zoom=14, null=True, blank=True)
     employees = models.ManyToManyField(Profile, related_name='employees', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
