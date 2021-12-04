@@ -1,4 +1,4 @@
-
+from haversine import haversine, Unit
 
 class ProcessAttendance:
     
@@ -26,30 +26,25 @@ class ProcessAttendance:
         distance = int(haversine((in_location.latitude, in_location.longitude), (out_location.latitude, out_location.longitude), unit=Unit.METERS))
         return distance <= settings.MAX_DISTANCE
 
-
-import boto3
-from django.conf import settings
-
-
 def compare_faces_for_checkin(target, source):
-    # response = client.compare_faces(
-    # SourceImage={
-    #     'Bytes': b'bytes',
-    #     'S3Object': {
-    #         'Bucket': 'string',
-    #         'Name': 'string',
-    #         'Version': 'string'
-    #     }
-    # },
-    #     TargetImage={
-    #         'Bytes': b'bytes',
-    #         'S3Object': {
-    #             'Bucket': 'string',
-    #             'Name': 'string',
-    #             'Version': 'string'
-    #         }
-    #     },
-    #     SimilarityThreshold=...,
-    #     QualityFilter='NONE'|'AUTO'|'LOW'|'MEDIUM'|'HIGH'
-    # )
+    response = client.compare_faces(
+    SourceImage={
+        'Bytes': b'bytes',
+        'S3Object': {
+            'Bucket': 'string',
+            'Name': 'string',
+            'Version': 'string'
+        }
+    },
+        TargetImage={
+            'Bytes': b'bytes',
+            'S3Object': {
+                'Bucket': 'string',
+                'Name': 'string',
+                'Version': 'string'
+            }
+        },
+        SimilarityThreshold=...,
+        QualityFilter='NONE'|'AUTO'|'LOW'|'MEDIUM'|'HIGH'
+    )
     return True

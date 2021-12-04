@@ -126,12 +126,13 @@ const Profile = (props) => {
     const submitData = async () => {
         try{
             console.log("Requested")
+            let accountProfile, bank, shop;
             // const base64 = await FileSystem.readAsStringAsync(img, { encoding: 'base64' });
             // console.error(base64)
             console.log(img)
             let promises  = [];
             if (img && phone){
-                const accountProfile = await axiosY({
+                 accountProfile = await axiosY({
                     url : '/accounts/profiles/',
                     method : 'post',
                     data : {
@@ -141,11 +142,11 @@ const Profile = (props) => {
                     }
                 })
             }
-            console.log(accountProfile.data)
+            // console.log(accountProfile.data)
 
 
             if (ifsc && account && accountHolder){
-                const bank = await axiosY({
+                bank = await axiosY({
                     url : '/accounts/bank-account/',
                     method : 'post',
                     data : {
@@ -158,7 +159,7 @@ const Profile = (props) => {
 
 
             if (shopCode){
-                const shop = await axiosY({
+                shop = await axiosY({
                     url : '/accounts/join-shop/',
                     method : 'post',
                     data : {
