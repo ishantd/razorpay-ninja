@@ -76,10 +76,8 @@ class ShopCRU(APIView):
     
     def get(self, request, *args, **kwargs):
         
-        try:
-            shop = Shop.objects.get(owner=request.user)
-        except:
-            return JsonResponse({"status": "shop not found"}, status=400)
+        shop = Shop.objects.get(owner=request.user)
+        # return JsonResponse({"status": "shop not found"}, status=400)
         
 
         return JsonResponse({"status": "ok", "data": model_to_dict(shop)}, status=200)
