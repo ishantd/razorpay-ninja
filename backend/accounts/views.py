@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.forms import model_to_dict
+from backend.accounts.models import Customer
 
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -316,3 +317,54 @@ class UpdateAndVerifyBankAccount(APIView):
         if bank_account and len(bank_account) == 1:
             return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_account[0])}, status=200)
         return JsonResponse({"status": "bad input"}, status=400)
+
+
+class CustomerCRUD(APIView):
+    def post(self, request, *args, **kwargs):
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.create(
+                name=name, address=address, location=location, email=email, phone=phone)     
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        customers = Customer.objects.all()
+        return JsonResponse({"status": "success", "customers": [model_to_dict(customer) for customer in customers]}, status=200)
+    
+    def put(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            customer.name = name
+            customer.address = address
+            customer.location = location
+            customer.email = email
+            customer.phone = phone
+            customer.save()
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    def delete(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            customer.delete()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    
+        
+        
