@@ -127,7 +127,6 @@ const classes = StyleSheet.create({
         borderBottomRightRadius : "0.3rem",
         fontSize : "1rem",
         backgroundColor : 'white',
-        
     },
 
     buttonContainer : {

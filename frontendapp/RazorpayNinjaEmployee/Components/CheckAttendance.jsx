@@ -5,6 +5,8 @@ import * as Location from 'expo-location';
 import {Dimensions} from 'react-native';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import Constants from 'expo'
+import * as ImagePicker from 'expo-image-picker';
+
 import {
     useFonts,
     Sora_200ExtraLight,
@@ -30,7 +32,7 @@ const CheckAttendance = () => {
     const [user, setUser] = useState();
 
 
-
+    
 
     const getLocation = async () => {
         try{
