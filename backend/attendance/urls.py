@@ -7,4 +7,5 @@ app_name = 'attendance'
 urlpatterns = [
     path('', views.AttendanceCRUD.as_view(), name='mark'),
     path('absent/', views.MarkAbsent.as_view(), name='absent'),
+    path('details/', views.AttendanceDetail.as_view(), name='details'),
 ]

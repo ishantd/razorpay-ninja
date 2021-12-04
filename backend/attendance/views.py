@@ -178,3 +178,29 @@ class MarkAbsent(APIView):
         atd.save()
         
         return JsonResponse({"status": "success", "message": "Marked Absent"}, status=200)
+
+class AttendanceDetail(APIView):
+    
+    def get(self, request, *args, **kwargs):
+        user_id = request.query_params.get("user_id", False)
+        date = request.query_params.get("date", False)
+        date_object = datetime.strptime(date, "%Y-%m-%d").date()
+        if user_id:
+            atd = Attendance.objects.filter(user__id=user_id, date=date_object)
+            if atd.exists() and len(atd) == 1:
+                a = atd[0]
+                data = {
+                    "status": "success",
+                    "attendance_time_in_location": a.attendance_time_in_location,
+                    "attendance_time_out_location": a.attendance_time_out_location,
+                    "attendance_time_in_selfie": a.attendance_time_in_selfie.url if a.attendance_time_in_selfie else None,
+                    "attendance_time_out_selfie": a.attendance_time_out_selfie.url if a.attendance_time_out_selfie else None,
+                    "absent": a.absent,
+                    "date": a.date.strftime("%Y-%m-%d"),
+                    "verified_face": a.verified_face,
+                    "verified_location": a.verified_location,
+                    "attendance_processed": a.attendance_processed
+                }
+                return JsonResponse({"status": "ok", "data": data}, status=200)
+        return JsonResponse({"status": "error", "message": "User not found"}, status=400)
+                
