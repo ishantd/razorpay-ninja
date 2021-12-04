@@ -165,5 +165,5 @@ class Customer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
-    phone       = models.CharField(validators=[phone_regex], max_length=10, null=True)
+    phone       = models.CharField(validators=[phone_regex], max_length=10, null=True, blank=True)
     phone_regex = RegexValidator( regex   =r'^\+?1?\d{4,14}$', message ="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.")

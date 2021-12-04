@@ -112,7 +112,8 @@ class AttendanceCRUD(APIView):
         attendance_type = request.data.get('type', False)
         location = request.data.get('location', False)
         user = request.user
-        if not location and attendance_type:
+        
+        if not (location and attendance_type):
             return JsonResponse({"status": "error", "message": "Location and atd type is required"}, status=400)
         
         todays_attendance = Attendance.objects.filter(user=user, date=datetime.today().date())
