@@ -118,6 +118,7 @@ class EmployeeCRUD(APIView):
         b64_image_string = request.data.get("profile_photo", False)
         profile = Profile.objects.get(user_id = request.user)
         if phone:
+            print("SAVING PHONE")
             profile.phone = phone
         if (dob):
             profile.dob = dob
@@ -134,7 +135,10 @@ class EmployeeCRUD(APIView):
                 img_io = io.BytesIO()
                 img.save(img_io, format='PNG')
                 profile.profile_picture = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{request.user.id}.png', size=img_io.tell, charset=None)
+                print(profile.profile_picture)
+        print(profile.phone)
         profile.save()
+        print(profile.id)
         
         return JsonResponse({"status": "ok"}, status=200)
     
