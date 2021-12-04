@@ -54,7 +54,7 @@ class CheckAttendance(APIView):
 class AttendanceCRUD(APIView):
     
     def get(self, request, *args, **kwargs):
-        employee_id = request.query_params.get('employee_id', False)
+        employee_id = request.query_params.get('user_id', False)
         user = request.user
         profile = Profile.objects.filter(user_id=user)
         user_profile = profile[0] if profile.exists() else None
