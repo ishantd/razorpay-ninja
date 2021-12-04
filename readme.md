@@ -36,5 +36,9 @@
 ![Alt text](/assets/empAttendance.jpeg)
 ![Alt text](/assets/empPayroll.jpeg)
 
+## Resource Diagram
+
+
+![png](https://user-images.githubusercontent.com/54077095/144720558-5483a634-707f-4fb0-81ba-80fd6f06f6a8.png)
 
 
