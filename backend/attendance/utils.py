@@ -1,3 +1,4 @@
+from django.conf import settings
 from haversine import haversine, Unit
 
 class ProcessAttendance:
@@ -15,7 +16,26 @@ class ProcessAttendance:
         """
         Verifies the face of the employee
         """
-        return True
+        response = self.client.compare_faces(
+        SourceImage={
+            
+            'S3Object': {
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Name': self.attendance.attendance_time_in_selfie.path,
+                
+            }
+        },
+            TargetImage={
+              
+                'S3Object': {
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Name': self.attendance.user.profile.profile_picture.path,
+                    
+                }
+            },
+            SimilarityThreshold=90.00,
+        )
+        return response['FaceMatches'][0]['Similarity'] >= 98.00
     
     def verify_location(self):
         """
