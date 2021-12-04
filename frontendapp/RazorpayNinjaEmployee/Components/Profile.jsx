@@ -1,10 +1,23 @@
 import React , {useEffect, useState} from 'react'
-import {  Text, View, Image } from 'react-native'
+import {
+    ScrollView,
+    View,
+    Text,
+    Image,
+    Alert,
+    Dimensions,
+    Platform,
+    TouchableOpacity,
+} from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Constants from 'expo-constants'
 import {TextInput, Button} from 'react-native-paper'
 import axios from 'axios'
 import AppLoading from 'expo-app-loading';
 import StyleSheet from 'react-native-extended-stylesheet'
+import {axiosAuthorizedInstance as axiosY} from '../CustomAxios/CustomAxios'
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 
 import {
@@ -37,72 +50,176 @@ const Profile = () => {
     });
 
 
-    const [bank, setBank] = useState();
+    // const [bank, setBank] = useState();
     const [ifsc, setIFSC] = useState();
     const [account, setAccount] = useState();
     const [phone, setPhone] = useState();
+    const [shopCode, setShopCode] = useState();
+    const [accountHolder, setAccountHolder] = useState()
+    const [img, setImage] = useState(null);
+
+    const getImgPermission = async () => {
+        try{
+            if (Platform.OS !== 'web') {
+              const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+              if (status !== 'granted') {
+                alert('Sorry, we need camera roll permissions to make this work!');
+              }
+            }
+        }
+        catch(err){
+            console.log(err)
+        }
+          
+    }
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+          base64 : true
+        });
+        // console.error(result)
+        if (!result.cancelled) {
+            setImage(result.uri);
+          }
+    }
 
 
+    useEffect(()=>{
+        getImgPermission();
+    })
+
+    const submitData = async () => {
+        try{
+
+            // const base64 = await FileSystem.readAsStringAsync(img, { encoding: 'base64' });
+            // console.error(base64)
+            let promises  = [];
+            const accountProfile = axiosY({
+                url : '/accounts/profiles/',
+                method : 'post',
+                data : {
+                    phone : phone,
+                    role : 'emp',
+                    profile_photo : img.base64
+                }
+            })
+
+            const bank = axiosY({
+                url : '/accounts/bank-account/',
+                method : 'post',
+                data : {
+                    account_number : account,
+                    ifsc : ifsc,
+                    account_holder : accountHolder
+                }
+            }) 
+
+            const shop = axiosY({
+                url : '/accounts/join-shop/',
+                method : 'post',
+                data : {
+                    shop_code : shopCode
+                }
+            })
+            promises = [accountProfile, bank, shop]
+
+            const res = await Promise.all(promises);
+        }
+        catch(err){
+
+        }
+    }
 
     if (!fontsLoaded) {
         return <AppLoading/>
     }
     return (
-        <View style={classes.container}>
+            <KeyboardAwareScrollView
+                contentContainerStyle ={{
+                display: "flex",
+                // flex: 1,
+                justifyContent: "space-evenly",
+                alignItems: "center",
+                height: Dimensions.get("window").height,
+                width: Dimensions.get("window").width,
+            }}
+            >
+            <View style={classes.container}>
             
-            <View style={classes.section1}>
-                
+                    <View style={classes.section1}>
+                        <View>
+                            <Text
+                                style={classes.topText}
+                            >
+                                Hello Tirtharaj,
+                            </Text>
+                        
+                            <Text
+                                style={classes.secondary}
+                            >
+                                Welcome to your Profile Page! Here you can manage all the important aspects of your account
+                            </Text>
+                        </View>
+                    </View>
+                    <View style={classes.section2}>
+                    
+                    <TouchableOpacity onPress = {pickImage}>
+                        <Image style={classes.logo} source={!img?require('../assets/placeholder.png'):{uri : img}}></Image>
+                    </TouchableOpacity>
+                    
+                    <TextInput
+                        label = "Shop Code"
+                        value = {shopCode}
+                        onChangeText = {text => setShopCode(text)}
+                        mode="outlined"
+                        style={classes.textInput}
+                        theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
 
-                <View>
-                    <Text
-                        style={classes.topText}
-                    >
-                        Hello Tirtharaj,
-                    </Text>
-                
-                    <Text
-                        style={classes.secondary}
-                    >
-                        Welcome to your Profile Page! Here you can manage all the important aspects of your account
-                    </Text>
+                    />
+                    <TextInput
+                        label = "Phone Number"
+                        value = {phone}
+                        onChangeText = {text => setPhone(text)}
+                        mode="outlined"
+                        style={classes.textInput}
+                        theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+
+                    />
+                    <TextInput
+                        label="Account Holder"
+                        value={accountHolder}
+                        onChangeText={text => setAccountHolder(text)}
+                        mode="outlined"
+                        style={classes.textInput}
+                        theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+                    />
+                    <TextInput
+                        label="Account Number"
+                        value={account}
+                        onChangeText={text => setAccount(text)}
+                        mode="outlined"
+                        style={classes.textInput}
+                        theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+
+
+                    />
+                    <TextInput
+                        label = "IFSC"
+                        value = {ifsc}
+                        onChangeText = {text => setIFSC(text)}
+                        mode="outlined"
+                        style={classes.textInput}
+                        theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+                    />
+                    <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>Update Details</Button>
                 </View>
             </View>
-            <View style={classes.section2}>
-                <Image style={classes.logo} source={require('../assets/placeholder.png')}></Image>
-                <TextInput
-                    label = "Phone Number"
-                    value = {phone}
-                    onChangeText = {text => setPhone(text)}
-                    mode="outlined"
-                    style={classes.textInput}
-                />
-                <TextInput
-                    label="Bank Name"
-                    value={bank}
-                    onChangeText={text => setBank(text)}
-                    mode="outlined"
-                    style={classes.textInput}
 
-                />
-                <TextInput
-                    label="Bank Name"
-                    value={account}
-                    onChangeText={text => setAccount(text)}
-                    mode="outlined"
-                    style={classes.textInput}
-
-                />
-                <TextInput
-                    label = "IFSC"
-                    value = {ifsc}
-                    onChangeText = {text => setIFSC(text)}
-                    mode="outlined"
-                    style={classes.textInput}
-                />
-                <Button mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>Update Details</Button>
-            </View>
-            
-        </View>
+            </KeyboardAwareScrollView>
     )
 }
 
@@ -148,7 +265,7 @@ const classes = StyleSheet.create({
         paddingLeft : "0.5rem",
         paddingRight : "0.5rem",
         backgroundColor : "#f3f1ef",
-        marginBottom : "1rem",
+        marginBottom : "0.5rem",
         borderRadius : "0.5rem"
     },
     secondary : {
@@ -161,13 +278,12 @@ const classes = StyleSheet.create({
         fontFamily : 'Sora_200ExtraLight'
     },
     logo : {
-        width : 120,
-        height : 120,
-        borderRadius : 120/2,
+        width : 100,
+        height : 100,
+        borderRadius : 100/2,
         alignSelf : 'center',
-        marginTop : 16,
+        marginTop : 8,
         borderWidth : 2,
         borderColor : '#102461',
-        
     }
 })

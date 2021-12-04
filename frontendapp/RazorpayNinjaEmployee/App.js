@@ -44,7 +44,7 @@ const AttendanceTracker = () => {
       screenOptions={{headerShown: false}}
 
     >
-      <Stack.Screen name="Attendance" component={Attendance} />
+      <Stack.Screen name="AttendancePage" component={Attendance} />
       <Stack.Screen name="CheckAttendance" component={CheckAttendance} />
     </Stack.Navigator>
   )
@@ -60,7 +60,7 @@ export function MainScreens() {
             if (route.name === 'Payroll') {
               iconName = focused ? 'ios-list' : 'ios-list';
             }
-            else if (route.name === 'Dashboard'){
+            else if (route.name === 'Attendance'){
               iconName = focused ? 'book-outline' : 'book-outline';
             }
             else if (route.name === 'Profile'){
@@ -77,7 +77,7 @@ export function MainScreens() {
         >
         <Tab.Screen name="Profile" component={Profile}/>
 
-        <Tab.Screen name="Dashboard" component={AttendanceTracker}/>
+        <Tab.Screen name="Attendance" component={AttendanceTracker}/>
         <Tab.Screen name="Payroll" component={Payroll}/>
 
       </Tab.Navigator>
@@ -93,8 +93,12 @@ export default function App(){
       <Stack.Navigator
         screenOptions={{headerShown : false}}
       >
+
         <Stack.Screen name="Auth" component={GAuth}/>
         <Stack.Screen name="Main" component={MainScreens}/>
+
+
+
       </Stack.Navigator>
 
     </NavigationContainer>

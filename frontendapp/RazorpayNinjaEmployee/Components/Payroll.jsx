@@ -34,8 +34,9 @@ const Card = (props) => {
                     </Text>
                     <Text
                      style={{
-                        fontFamily : 'Sora_200ExtraLight',
-                        fontSize : 10,
+                        fontFamily : 'Sora_300Light',
+                        fontSize : 15,
+                        color : props.description === "Paid"?"green":"red",
                         textAlign : 'justify',
                     }}
                     >
@@ -83,14 +84,23 @@ const Payroll = () => {
                 >
                     Payroll Manager
                 </Text>
+                <Text
+                    style={classes.secondary}
+                >
+                    Check All your payments received from a particular shop
+                </Text>
             </View>
-            
-            <FlatList
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={item => item.header}
-                style={classes.cardContainer}
-            />
+            <View style={classes.section2}>
+                <FlatList
+                    style={{width : "100%", marginTop : -20}}
+                    data={data}
+                    renderItem={renderItem}
+                    keyExtractor={item => item.header}
+                    style={classes.cardContainer}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
         </View>
     )
 }
@@ -136,16 +146,61 @@ const classes = StyleSheet.create({
     },
     section1 :{
         flex : 0.5,
-        alignItems : 'center',
-        justifyContent : 'center',
+        alignItems : 'flex-start',
+        justifyContent : 'flex-end',
         width : "100%",
         backgroundColor : '#102461'
+    },
+    section2 : {
+        flex : 2,
+        // paddingLeft : 20,
+        // paddingRight : 20,
+        alignItems : "center",
+        // backgroundColor : '#7d96e333',
+        paddingTop : 10,
+        paddingLeft : 20,
+        paddingRight : 20,
+        width : "100%"
+        // zIndex : 5,
+        // elevation : 5
     },
     topText : {
         fontSize :16,
         fontFamily : "Sora_500Medium",
-        color : "white"
+        color : "white",
+        paddingLeft : 20,
     },
+
+    card : {
+        backgroundColor : "white",
+        width : 300,
+        height : 80,
+        marginBottom : 15,
+        paddingLeft : 15,
+        paddingRight : 15,
+        borderRadius : 2
+        // marginTop : -15
+    },
+    cardBody: {
+        width : '100%',
+        flex : 1,
+        justifyContent : "center"
+    },
+    textBox : {
+        flexDirection : 'row',
+        alignItems : 'center',
+        justifyContent : 'space-between'
+    },
+    secondary : {
+        color : 'white',
+        fontSize : 15,
+        fontWeight : '100',
+        paddingLeft : 20,
+        paddingBottom :20,
+        paddingRight : 50,
+        fontFamily : 'Sora_200ExtraLight'
+    },
+
 })
 
 export default Payroll

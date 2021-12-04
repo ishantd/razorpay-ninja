@@ -13,7 +13,7 @@ export const axiosAuthorizedInstance = axios.create({
     baseURL : `https://api.razorpay.ninja`,
     headers : {
         "Content-Type" : "application/json",
-        "Authorization" : `Token 95f3284b36ee5f889abd3382dc6583fc1ee54586`,
+        // "Authorization" : `Token 95f3284b36ee5f889abd3382dc6583fc1ee54586`,
     } 
 })
 
