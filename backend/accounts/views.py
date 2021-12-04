@@ -146,7 +146,7 @@ class EmployeeCRUD(APIView):
         data = {
             "name": f'{profile.user_id.first_name} {profile.user_id.last_name}',
             "role": profile.role,
-            "shop": model_to_dict(profile.emp_in_shop) if ,
+            "shop": model_to_dict(profile.emp_in_shop) if profile.emp_in_shop else None,
             "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
             "phone": profile.phone,
         }
