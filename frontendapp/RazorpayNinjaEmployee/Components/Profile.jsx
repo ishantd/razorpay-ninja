@@ -50,7 +50,7 @@ const Profile = (props) => {
         Roboto_700Bold,
     });
 
-
+    
     // const [bank, setBank] = useState();
     const [ifsc, setIFSC] = useState();
     const [account, setAccount] = useState();
@@ -58,11 +58,14 @@ const Profile = (props) => {
     const [shopCode, setShopCode] = useState();
     const [accountHolder, setAccountHolder] = useState()
     const [img, setImage] = useState(null);
-    const [visible, setVisible] = React.useState(false);
+    const [visible, setVisible] = useState(false);
 
-    const onToggleSnackBar = () => setVisible(!visible);
-  
-    const onDismissSnackBar = () => setVisible(false);
+
+    const [shopExists, setShopExists] = useState(false);
+    const [mobileExists, setMobileExists] = useState(false);
+    const [nameExists, setNameExists] = useState(false);
+    const [accountExists, setAccountExists] = useState(false);
+    const [ifscExists, setIFSCExists] = useState(false);
     const [loading, setLoading] = useState(false)
     const getImgPermission = async () => {
         try{
@@ -106,6 +109,13 @@ const Profile = (props) => {
             setPhone(accountProfile.data.data.phone)
             setImage(accountProfile.data.data.profile_photo)
             setShopCode(accountProfile.data.data.shop.unique_code)
+            if (accountProfile.data.data.shop.unique_code?.length>0){
+                setShopExists(true)
+            }
+            if (accountProfile.data.data.phone?.length>0){
+                setMobileExists(true)
+            }
+            
 
             // console.log(accountProfile.data)
             
@@ -118,13 +128,23 @@ const Profile = (props) => {
             setAccount(bankDeets.data.bank_details.account_number)
             setIFSC(bankDeets.data.bank_details.ifsc)
 
-        }
+            if (bankDeets.data.name_at_bank?.length>0){
+                setNameExists(true)
+            }
+            if (bankDeets.data.account_number?.length>0){
+                setAccountExists(true)
+            }
+            if (bankDeets.data.ifsc?.length>0){
+                setIFSCExists(true)
+            }
+        }   
         catch(err){
             console.log(err)
         }
     }
 
     const submitData = async () => {
+        setLoading(true)
         try{
             console.log("Requested")
             let accountProfile, bank, shop;
@@ -132,19 +152,19 @@ const Profile = (props) => {
             // console.error(base64)
             console.log(img)
             let promises  = [];
-            if (img && phone){
+            if (phone){
                  accountProfile = await axiosY({
                     url : '/accounts/profiles/',
                     method : 'post',
                     data : {
                         phone : phone,
                         role : 'emp',
-                        profile_photo : `data:image/jpg;base64,${img.base64}`
+                        profile_photo : img?`data:image/jpg;base64,${img?.base64}`:""
                     }
                 })
             }
             // console.log(accountProfile.data)
-
+            if (accountProfile.status === 200) setMobileExists(true);
 
             if (ifsc && account && accountHolder){
                 bank = await axiosY({
@@ -159,7 +179,7 @@ const Profile = (props) => {
             }
 
 
-            if (shopCode){
+            if (true){
                 shop = await axiosY({
                     url : '/accounts/join-shop/',
                     method : 'post',
@@ -176,11 +196,14 @@ const Profile = (props) => {
             
 
 
-            if (shop.data.status  === 'ok' || bank.data.status === 'ok' || accountProfile.data.status === 'ok')
-                props.navigation.navigate("Attendance")
+            
+            props.navigation.navigate("Attendance")
+            setLoading(false)
         }
         catch(err){
             console.log(err)
+            setLoading(false)
+
         }
     }
     useEffect(()=>{
@@ -209,7 +232,7 @@ const Profile = (props) => {
                             <Text
                                 style={classes.topText}
                             >
-                                Hello Tirtharaj,
+                                Welcome,
                             </Text>
                         
                             <Text
@@ -222,7 +245,11 @@ const Profile = (props) => {
                     <View style={classes.section2}>
                     
                     <TouchableOpacity onPress = {pickImage}>
-                        <Image style={classes.logo} source={!img?require('../assets/placeholder.png'):{uri : img.uri}}></Image>
+                        <Image
+                        onLoadStart = {()=>setVisible(false)}
+                        onLoadEnd = {()=>setVisible(true)}
+                        style={classes.logo} source={!img?require('../assets/placeholder.png'):{uri : img.uri?img.uri : img}}></Image>
+                        {!visible?<ActivityIndicator size="large" color="#102461" style={{position : 'absolute', alignSelf : 'center', marginTop : 50}}></ActivityIndicator>:null}
                     </TouchableOpacity>
                     
                     <TextInput
@@ -232,7 +259,7 @@ const Profile = (props) => {
                         mode="outlined"
                         style={classes.textInput}
                         theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
-
+                        disabled={shopExists}
                     />
                     <TextInput
                         label = "Phone Number"
@@ -241,15 +268,16 @@ const Profile = (props) => {
                         mode="outlined"
                         style={classes.textInput}
                         theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
-
                     />
-                    <TextInput
+                    
+                    <><TextInput
                         label="Account Holder"
                         value={accountHolder}
                         onChangeText={text => setAccountHolder(text)}
                         mode="outlined"
                         style={classes.textInput}
                         theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+                        disabled={nameExists}
                     />
                     <TextInput
                         label="Account Number"
@@ -258,7 +286,8 @@ const Profile = (props) => {
                         mode="outlined"
                         style={classes.textInput}
                         theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
-
+                        disabled={accountExists}
+                        keyboardType="number-pad"
 
                     />
                     <TextInput
@@ -268,8 +297,10 @@ const Profile = (props) => {
                         mode="outlined"
                         style={classes.textInput}
                         theme={{ colors: { primary: '#102461',underlineColor:'transparent',}}}
+                        disabled={ifscExists}
                     />
-                    <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>Update Details</Button>
+                    </>
+                    <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>{loading?<ActivityIndicator size="small" color="white"></ActivityIndicator>:"Update Details"}</Button>
                 </View>
             </View>
             
