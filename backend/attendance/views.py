@@ -80,23 +80,20 @@ class AttendanceCRUD(APIView):
 
                 data["attendances"].append(atd)
         if not employee_id:
-            profiles = Profile.objects.filter(shop=shop)
-            p = Profile.objects.filter(role='emp')
-            for ps in p:
-                print(ps.emp_in_shop)
-            print(p)
-            print(profiles)
+            empprofiles = Profile.objects.all()
             data["employee_data"] = []
-            for emp in profiles:
-                payout, payout_created = Payout.objects.get_or_create(employee_id=emp)
-                data["employee_data"].append({
-                    "name": f'{emp.user_id.first_name} {emp.user_id.last_name}',
-                    "user_id": emp.user_id.id,
-                    "role": emp.role,
-                    "shop": model_to_dict(emp.emp_in_shop),
-                    "emp_id": emp.id,
-                    "profile_photo": emp.profile_picture.url if emp.profile_picture else None,
-                    "payout": model_to_dict(payout) if not payout_created else None})
+            for emp in empprofiles:
+                if emp.emp_in_shop:
+                    if emp.role == 'emp' and emp.emp_in_shop.id == shop.id:
+                        payout, payout_created = Payout.objects.get_or_create(employee_id=emp)
+                        data["employee_data"].append({
+                            "name": f'{emp.user_id.first_name} {emp.user_id.last_name}',
+                            "user_id": emp.user_id.id,
+                            "role": emp.role,
+                            "shop": model_to_dict(emp.emp_in_shop),
+                            "emp_id": emp.id,
+                            "profile_photo": emp.profile_picture.url if emp.profile_picture else None,
+                            "payout": model_to_dict(payout) if not payout_created else None})
         return JsonResponse(data, status=200)
         
     
