@@ -163,7 +163,7 @@ class AttendanceCRUD(APIView):
 class MarkAbsent(APIView):
     
     def get(self, request, *args, **kwargs):
-        user_id = request.data.get("user_id", False)
+        user_id = request.query_params.get("user_id", False)
         
         atd = Attendance.objects.get_or_create(user__id=user_id, date=datetime.today().date())
         atd.absetnt = True
