@@ -6,6 +6,10 @@ from location_field.models.plain import PlainLocationField
 import uuid
 
 from accounts.utils import random_string
+from accounts.rzpxapi import RazorpayX
+
+# Create CUSTOMER AND APIS
+
 
 class State(models.Model):
     unique_id = models.IntegerField(default=0)
@@ -59,7 +63,9 @@ class UserBankAccount(models.Model):
     name_at_bank = models.CharField(max_length=150, null=True, blank=True)
     account_number = models.CharField(max_length=150, null=True, blank=True)
     verified = models.BooleanField(default=False)
+    razorpay_processed = models.BooleanField(default=False)
     verified_timestamp = models.DateTimeField(null=True, blank=True)
+
 
 class PanCard(models.Model):
     pan_number = models.CharField(max_length=10, null=True, blank=True)
