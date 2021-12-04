@@ -1,5 +1,6 @@
 from django.conf import settings
 from haversine import haversine, Unit
+import boto3
 
 class ProcessAttendance:
     
