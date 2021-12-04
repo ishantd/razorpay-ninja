@@ -83,10 +83,8 @@ class JoinShop(APIView):
         
         user = request.user
         profile = Profile.objects.get(user_id = user)
-        
-        if profile.role != 'emp':
-            return JsonResponse({"status": "not emp"}, status=400)
-        
+
+        print(request.data)
         shop_code = request.data.get('shop_code', False)
         if not shop_code:
             return JsonResponse({"status": "not ok"}, status=400)
@@ -318,7 +316,9 @@ class UpdateAndVerifyBankAccount(APIView):
     def get(self, request, *args, **kwargs):
         bank_account = UserBankAccount.objects.filter(user_id=request.user)
         if bank_account and len(bank_account) == 1:
-            return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_account[0])}, status=200)
+            data = model_to_dict(bank_account[0])
+            data["ifsc"] = bank_account[0].bank.ifsc
+            return JsonResponse({"status": "success", "bank_details":data}, status=200)
         return JsonResponse({"status": "bad input"}, status=400)
 
 

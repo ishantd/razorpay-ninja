@@ -18,7 +18,7 @@ import StyleSheet from 'react-native-extended-stylesheet'
 import {axiosAuthorizedInstance as axiosY} from '../CustomAxios/CustomAxios'
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-import {  Snackbar } from 'react-native-paper';
+// import {  Snackbar } from 'react-native-paper';
 
 import {
     useFonts,
@@ -36,7 +36,7 @@ import {
 } from '@expo-google-fonts/roboto';
 
 
-const Profile = () => {
+const Profile = (props) => {
 
     let [fontsLoaded] = useFonts({
         Sora_200ExtraLight,
@@ -88,9 +88,7 @@ const Profile = () => {
     }
 
 
-    useEffect(()=>{
-        getImgPermission();
-    })
+    
 
 
     const [visible, setVisible] = React.useState(false);
@@ -106,25 +104,33 @@ const Profile = () => {
                 method : 'get',
                 url : '/accounts/profiles/'
             });
-            setPhone(accountProfile.data.phone)
-            setImage(accountProfile.data.profile_photo)
+            setPhone(accountProfile.data.data.phone)
+            setImage(accountProfile.data.data.profile_photo)
+            setShopCode(accountProfile.data.data.shop.unique_code)
 
-
-
+            // console.log(accountProfile.data)
+            
             const bankDeets = await axiosY({
                 method : 'get',
                 url : '/accounts/bank-account/'
             })
-            console.log(bankDeets)
+            // console.log(bankDeets.data)
+            setAccountHolder(bankDeets.data.bank_details.name_at_bank)
+            setAccount(bankDeets.data.bank_details.account_number)
+            setIFSC(bankDeets.data.bank_details.ifsc)
 
+        }
+        catch(err){
+            console.log(err)
         }
     }
 
     const submitData = async () => {
         try{
-
+            console.log("Requested")
             // const base64 = await FileSystem.readAsStringAsync(img, { encoding: 'base64' });
             // console.error(base64)
+            console.log(img)
             let promises  = [];
             const accountProfile = await axiosY({
                 url : '/accounts/profiles/',
@@ -132,10 +138,10 @@ const Profile = () => {
                 data : {
                     phone : phone,
                     role : 'emp',
-                    profile_photo : img.base64
+                    profile_photo : img
                 }
             })
-
+            console.log(accountProfile.data)
             const bank = await axiosY({
                 url : '/accounts/bank-account/',
                 method : 'post',
@@ -156,13 +162,18 @@ const Profile = () => {
             // promises = [accountProfile, bank, shop]
 
             // const res = await Promise.all(promises);
-            console.log(res)
-            onToggleSnackBar()
+            // console.log(res)
+            // onToggleSnackBar()
+            props.navigation.navigate("Attendance")
         }
         catch(err){
-
+            console.log(err)
         }
     }
+    useEffect(()=>{
+        getImgPermission();
+        getData()
+    },[])
 
     if (!fontsLoaded) {
         return <AppLoading/>
@@ -248,17 +259,7 @@ const Profile = () => {
                     <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>Update Details</Button>
                 </View>
             </View>
-            <Snackbar
-                visible={visible}
-                onDismiss={onDismissSnackBar}
-                action={{
-                label: 'Undo',
-                onPress: () => {
-                    // Do something
-                },
-                }}>
-                Hey there! I'm a Snackbar.
-            </Snackbar>
+            
             </KeyboardAwareScrollView>
     )
 }

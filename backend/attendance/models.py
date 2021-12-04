@@ -22,10 +22,3 @@ class Attendance(models.Model):
     attendance_processed = models.BooleanField(default=False)
     verified_face = models.BooleanField(default=False)
     verified_location = models.BooleanField(default=False)
-    
-
-        # p = ProcessAttendance(instance)
-        # instance.verified_face = p.verify_face()
-        # instance.verified_location = p.verify_location()
-        # instance.attendance_processed = True
-        # instance.save()
