@@ -300,7 +300,8 @@ const Profile = (props) => {
                         disabled={ifscExists}
                     />
                     </>
-                    <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>{loading?<ActivityIndicator size="small" color="white"></ActivityIndicator>:"Update Details"}</Button>
+                    <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>{"Update Details"}</Button>
+                    {loading?<ActivityIndicator size="small" color="white"></ActivityIndicator>:null}
                 </View>
             </View>
             

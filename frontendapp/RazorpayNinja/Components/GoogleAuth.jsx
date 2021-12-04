@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import * as Google from 'expo-google-app-auth';
-import {View, Text, Button, TouchableOpacity, Image} from 'react-native'
+import {View, Text, Button, TouchableOpacity, Image, ActivityIndicator} from 'react-native'
 import StyleSheet from 'react-native-extended-stylesheet'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { axiosRequestAuthInstance as axiosN } from '../CustomAxios/customAxios';
@@ -16,8 +16,10 @@ const storeData = async (value) => {
 }
 
 export default function GAuth(props) {
+    const [loading, setLoading] = useState(false)
     const [accessT, setToken] = useState()
     const gLogin = async () => {
+        setLoading(true)
         try{
             const {type, accessToken, idToken, user} = await Google.logInAsync({
                 iosClientId : `133149144745-ombhlr10huq710h3aciia0kbko2lt93j.apps.googleusercontent.com`,
@@ -40,6 +42,7 @@ export default function GAuth(props) {
             })
             // throw authReq
             storeData(authReq.data.key)
+            setLoading(false)
             props.navigation.navigate("OnBoarding1", {user})
             // throw (authReq)
         }
@@ -57,6 +60,9 @@ export default function GAuth(props) {
     
     return (
         <View style={classes.container}>
+            {
+                loading ?<ActivityIndicator size="large" color="#102461"></ActivityIndicator>:
+            <>
             <View style={classes.logo}>
                 <Image style={classes.img} source={require('../assets/logo-lg.png')}/>
             </View>
@@ -71,6 +77,7 @@ export default function GAuth(props) {
                     <Text style={classes.text}>Sign In with google</Text>
                 </TouchableOpacity>
             </View>
+            </>}
         </View>
     )
 
