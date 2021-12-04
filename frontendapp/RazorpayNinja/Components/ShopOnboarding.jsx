@@ -1,34 +1,89 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pressable, Modal, TextInput } from 'react-native'
+import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pressable, Modal, TextInput, Dimensions } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as Location from 'expo-location';
+import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
+const storeData = async (key, value) => {
+    await AsyncStorage.setItem(key, value)
+}
+
 
 function ShopOnboarding (props) {
+    const [location, setLocation] = useState(null);
+
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+    const [phone, setPhone] = useState('');
+
+    const navigation = useNavigation();
+
+    const createProfile = () => {
+        const requestOptions = {
+            method : 'post',
+            url : '/accounts/profiles/',
+            data : { phone: phone, role: 'owner' }
+        }
+        axiosAuthorizedInstance(requestOptions).then((response) => { createShop(); }).catch((error) => { console.error(error); });
+    }
+
+    const createShop = () => {
+        const requestOptions = {
+            method : 'post',
+            url : '/accounts/shop/',
+            data : { name: name, address: address, location: `${location.coords.latitude},${location.coords.longitude}` }
+        }
+        axiosAuthorizedInstance(requestOptions).then((response) => { storeData('shop', JSON.stringify(response.data.shop_data)); navigation.navigate('AppScreens'); }).catch((error) => { console.error(error); });
+    }
+
+    useEffect(() => {
+        (async () => {
+          let { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+            setLocation(null);
+            return;
+          }
+          let location = await Location.getCurrentPositionAsync({});
+          setLocation(location);
+          console.log(location);
+        })();
+    }, []);
+
     return (
-        <ScrollView style={styles.page}>
+        <View style={styles.page}>
             <View style={styles.header}>
-                <View style={styles.headerImage}/>
                 <View style={styles.headerText}>
                     <Text style={styles.headerTextName}>Shop Setup</Text>
                     <Text style={styles.headerTextDetails}>Enter the following details to set up your shop.</Text>
                 </View>
             </View>
             <View style={modalStyles.inputContainer}>
-                <TextInput keyboardType='name-phone-pad' style={modalStyles.inputBox} placeholder="Shop Name"/>
-                <TextInput keyboardType='name-phone-pad' multiline={true} underlineColorAndroid='transparent' style={modalStyles.inputBox} placeholder="Shop Address"/>
+                <TextInput keyboardType='name-phone-pad' style={modalStyles.inputBox} placeholder="Shop Name" value={name} onChangeText={(name) => setName(name)}/>
+                <TextInput keyboardType='numeric' style={modalStyles.inputBox} placeholder="Phone Number" maxLength={10} value={phone} onChangeText={(name) => setPhone(name)}/>
+                <TextInput keyboardType='name-phone-pad' multiline={true} underlineColorAndroid='transparent' style={modalStyles.inputBox} placeholder="Shop Address" value={address} onChangeText={(address) => setAddress(address)}/>
             </View>
+            <Text style={modalStyles.modalText}>Note: Clicking "Create Shop" will set your current location as the shop's geolocation. This is used to verify attendance. Please proceed only when you're at your shop.</Text>
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
-                    <Text style={styles.buttonText}>Create Shop</Text>
-                </TouchableOpacity>
+                {
+                    location ? 
+                    <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => createProfile()}>
+                        <Text style={styles.buttonText}>Create Shop</Text>
+                    </TouchableOpacity> : 
+                    <Text style={styles.headerTextDetails}>Premission to location was denied. Please go to settings and allow RazorpayNinja access to your location to proceed.</Text>
+                }
             </View>
-        </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     page: {
         backgroundColor: '#FFFFFF',
-        flex: 1
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     header: {
@@ -73,6 +128,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
 
         paddingVertical: 16,
+
+        width: Dimensions.get('window').width - 64,
     },
 
     buttonRed: {
@@ -101,21 +158,6 @@ const modalStyles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)'
     },
 
-    modalView: {
-        margin: 16,
-        backgroundColor: "white",
-        borderRadius: 4,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-
     buttonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
@@ -130,19 +172,23 @@ const modalStyles = StyleSheet.create({
         borderColor: '#0A6FEB',
         borderRadius: 4,
         borderWidth: 2,
-        paddingVertical: 8,
+        paddingVertical: 12,
         paddingHorizontal: 16,
-        marginHorizontal: 4,
+        marginHorizontal: 16,
+
+        fontSize: 16,
 
         marginVertical: 8,
+
+        width: Dimensions.get('window').width - 64,
     },
 
     button: {
         backgroundColor: '#0A6FEB',
         borderRadius: 4,
         paddingVertical: 8,
-        width: '45%',
-        marginHorizontal: 16
+        width: Dimensions.get('window').width - 128,
+        marginHorizontal: 16,
     },
 
     buttonRed: {
@@ -161,7 +207,7 @@ const modalStyles = StyleSheet.create({
 
     modalText: {
         marginHorizontal: 8,
-        marginVertical: 16,
+        marginVertical: 32,
         fontSize: 12
     },
 

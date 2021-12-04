@@ -3,7 +3,7 @@ import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pr
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Calendar } from 'react-native-calendars';
 
-const link = 'https://www.uia.no/var/uia/storage/images/media/images/2021-nyhetsbilder-1-vaar/qr-code-1500-q/2018792-1-nor-NO/qr-code-1500-q_fullwidth.jpg';
+//const link = 'https://www.uia.no/var/uia/storage/images/media/images/2021-nyhetsbilder-1-vaar/qr-code-1500-q/2018792-1-nor-NO/qr-code-1500-q_fullwidth.jpg';
 
 function Shop (props) {
     const [modalVisible, setModalVisible] = useState(false);
@@ -14,18 +14,20 @@ function Shop (props) {
             <View style={styles.header}>
                 <View style={styles.headerImage}/>
                 <View style={styles.headerText}>
-                    <Text style={styles.headerTextName}>Shop Name</Text>
+                    <Text style={styles.headerTextName}>TestShop</Text>
+                    <Text style={styles.headerTextDetailsBold}>9876543211</Text>
                     <Text style={styles.headerTextDetails}>F - 53 Road No 2</Text>
                     <Text style={styles.headerTextDetails}>Andrews Ganj New Delhi</Text>
+                    <Text style={styles.headerTextDetailsBold}>Shop Code - Td3aAqJk</Text>
                 </View>
             </View>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
                     <Text style={styles.buttonText}>Edit Shop Details</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalQRVisible(true)}>
+                {/*}<TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalQRVisible(true)}>
                     <Text style={styles.buttonText}>Generate Join QR</Text>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
                 <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
@@ -35,6 +37,7 @@ function Shop (props) {
                     <View style={modalStyles.modalView}>
                         <View style={modalStyles.inputContainer}>
                             <TextInput keyboardType='name-phone-pad' style={modalStyles.inputBox} placeholder="Shop Name"/>
+                            <TextInput keyboardType='numeric' style={modalStyles.inputBox} placeholder="Phone Number" maxLength={10}/>
                             <TextInput keyboardType='name-phone-pad' multiline={true} underlineColorAndroid='transparent' style={modalStyles.inputBox} placeholder="Shop Address"/>
                         </View>
                         <Text style={modalStyles.modalText}>Note: Clicking "Update Shop" will set your current location as the shop's geolocation. This is used to verify attendance. Please proceed only when you're at your shop.</Text>
@@ -49,7 +52,7 @@ function Shop (props) {
                     </View>
                 </View>
             </Modal>
-            <Modal animationType='fade' transparent={true} visible={modalQRVisible}>
+            {/*}<Modal animationType='fade' transparent={true} visible={modalQRVisible}>
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
                         <Image source={{ uri: link }} resizeMode='contain' resizeMethod='scale' style={modalStyles.qrImage}/>
@@ -60,7 +63,7 @@ function Shop (props) {
                         </View>
                     </View>
                 </View>
-            </Modal>
+            </Modal>*/}
         </ScrollView>
     );
 }
@@ -98,6 +101,12 @@ const styles = StyleSheet.create({
 
     headerTextDetails: {
         fontSize: 16,
+        marginVertical: 4,
+    },
+
+    headerTextDetailsBold: {
+        fontSize: 16,
+        fontWeight: 'bold',
         marginVertical: 4,
     },
 

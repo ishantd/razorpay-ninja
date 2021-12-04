@@ -22,6 +22,8 @@ function LoginPage (props) {
                 scopes : ['profile', 'email', 'phone']
             });
 
+            console.log(result);
+
             const requestOptions = {
                 method : 'post',
                 url : '/accounts/auth/google/',

@@ -17,15 +17,11 @@ export const axiosAuthorizedInstance = axios.create({
 
 axiosAuthorizedInstance.interceptors.request.use(
     async config => {
-    const value = await AsyncStorage.getItem('key')
-      if (value) {
-        console.log(value)
-        config.headers.Authorization = "Token "+ value
-      }
-      return config
-      
+    	const value = await AsyncStorage.getItem('key');
+      	if (value) {
+        	config.headers.Authorization = "Token " + value
+      	}
+      	return config
     },
-    error => {
-      throw error
-    }
+    error => { throw error }
 );
