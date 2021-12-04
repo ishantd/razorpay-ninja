@@ -47,7 +47,7 @@ class PayoutCRU(APIView):
         
         if amount and date:
             payout, payout_created = Payout.objects.get_or_create(employee_id__user_id__id=user_id)
-            payout.amount = int(amount) * 100
+            payout.amount = int(amount)
             payout.date = int(date)
             payout.save()
             
