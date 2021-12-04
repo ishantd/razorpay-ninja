@@ -1,6 +1,6 @@
 from django.conf import settings
 
-# from accounts.models import User, Profile
+from accounts.models import User, Profile
 
 import json
 import requests
