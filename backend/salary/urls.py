@@ -5,5 +5,5 @@ from salary import views
 app_name = 'salary'
 
 urlpatterns = [
-    path('payout/', views.PayoutCRU, name='payout'),
+    path('payout/', views.PayoutCRU.as_view(), name='payout'),
 ]
