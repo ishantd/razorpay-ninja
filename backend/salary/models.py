@@ -11,6 +11,7 @@ class PayoutTransaction(models.Model):
     """
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     payout = models.ForeignKey(Payout, on_delete=models.CASCADE)
+    razorpay_payout_id = models.CharField(max_length=100, null=True)
     amount = models.FloatField()
     status = models.CharField(max_length=20, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)

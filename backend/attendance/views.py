@@ -54,7 +54,7 @@ class CheckAttendance(APIView):
 class AttendanceCRUD(APIView):
     
     def get(self, request, *args, **kwargs):
-        employee_id = request.query_params.get('employee_id', False)
+        employee_id = request.query_params.get('user_id', False)
         user = request.user
         profile = Profile.objects.filter(user_id=user)
         user_profile = profile[0] if profile.exists() else None
@@ -79,6 +79,17 @@ class AttendanceCRUD(APIView):
                 }
 
                 data["attendances"].append(atd)
+            empuser = User.objects.get(id=employee_id)
+            empprofile = Profile.objects.get(user_id=empuser)
+            payoutemp = Payout.objects.get(employee_id=empprofile)
+            data["employee_data"] = {
+                            "name": f'{empuser.first_name} {empuser.last_name}',
+                            "user_id": empuser.id,
+                            "role": empprofile.role,
+                            "shop": model_to_dict(empprofile.emp_in_shop),
+                            "emp_id": empprofile.id,
+                            "profile_photo": empprofile.profile_picture.url if empprofile.profile_picture else None,
+                            "payout": model_to_dict(payoutemp)}
         if not employee_id:
             empprofiles = Profile.objects.all()
             data["employee_data"] = []

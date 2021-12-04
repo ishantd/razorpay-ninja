@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.forms.models import model_to_dict
 
 from accounts.models import User, Profile
+from salary.models import Payout, PayoutTransaction
 
 import json
 import requests
@@ -15,6 +17,7 @@ class RazorpayX:
         self.base_url = 'https://api.razorpay.com/v1'
         self.contact_url = self.base_url + '/contacts'
         self.fund_url = self.base_url + '/fund_accounts'
+        self.payout_url = self.base_url + '/payouts'
         
         self.headers = {
             "Content-Type": "application/json"
@@ -59,6 +62,33 @@ class RazorpayX:
             data=json.dumps(data),
         )
     
+    
+    def send_payout(self):
+        payout = Payout.objects.filter(employee_id=self.user_profile)
+        if payout.exists() and len(payout) == 1:
+            payout = payout[0]
+            if payout.amount != 0 and payout.date_of_every_month and self.user_profile.razorpay_fund_account_id:
+                data = {
+                    "account_number": settings.RAZORPAY_ACCOUNT_NUMBER,
+                    "fund_account_id": self.user_profile.razorpay_fund_account_id,
+                    "amount": payout.amount*100,
+                    "currency": "INR",
+                    "mode": "IMPS",
+                    "purpose": "salary"
+                }
+                
+                response = requests.post(self.payout_url, auth=self.auth, headers=self.headers, data=json.dumps(data))
+                print(response.status_code, response.json())
+                if response.status_code == 200:
+                    payout_txn = PayoutTransaction.objects.create(
+                        profile=self.user_profile,
+                        payout=payout,
+                        razorpay_payout_id=response.json()['id'],
+                        amount=response.json()['amount'],
+                        status="done"
+                    )
+                    return model_to_dict(payout_txn)
+        return False
     
     def init_user_for_payouts(self):
         data = {}
