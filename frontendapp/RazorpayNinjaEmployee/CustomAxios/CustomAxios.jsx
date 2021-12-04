@@ -3,14 +3,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export const axiosRequestAuthInstance = axios.create({
-    baseURL : `https://api.razorpay.ninja`,
+    baseURL : `http://192.168.5.163:8000`,
     headers : {
         "Content-Type" : "application/json",
     } 
 })
 
 export const axiosAuthorizedInstance = axios.create({
-    baseURL : `https://api.razorpay.ninja`,
+    baseURL : `http://192.168.5.163:8000`,
     headers : {
         "Content-Type" : "application/json",
         // "Authorization" : `Token 95f3284b36ee5f889abd3382dc6583fc1ee54586`,

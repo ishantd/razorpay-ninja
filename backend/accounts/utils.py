@@ -19,7 +19,7 @@ def random_string():
     return "".join(random.sample(megastring, 8))
 
 def create_message_string_from_otp(otp):
-    return f'OTP to update your mobile number on MCRO is : {otp}'
+    return f'OTP to update your mobile number on Razorpay Ninja is : {otp}'
 
 
 def isValidPanCardNo(panCardNo):

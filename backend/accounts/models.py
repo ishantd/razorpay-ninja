@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
@@ -60,7 +61,8 @@ class UserBankAccount(models.Model):
     name_at_bank = models.CharField(max_length=150, null=True, blank=True)
     account_number = models.CharField(max_length=150, null=True, blank=True)
     verified = models.BooleanField(default=False)
-    verified_timestamp = models.DateTimeField(null=True, blank=True)
+    razorpay_processed = models.BooleanField(default=False)
+    verified_timestamp = models.DateTimeField(default=timezone.now)
 
 class PanCard(models.Model):
     pan_number = models.CharField(max_length=10, null=True, blank=True)
@@ -69,6 +71,7 @@ class PanCard(models.Model):
     category = models.CharField(max_length=150, null=True, blank=True)
     verified = models.BooleanField(default=False)
     verified_by_user = models.BooleanField(default=False)
+    razorpay_processed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(null=True, blank=True)
 
 
@@ -127,6 +130,7 @@ class Shop(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    address_string = models.TextField(null=True, blank=True)
     unique_code = models.CharField(max_length=8, default=random_string, unique=True)
     location = PlainLocationField(zoom=14, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

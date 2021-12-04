@@ -58,8 +58,7 @@ class ShopCRU(APIView):
             return JsonResponse({"status": "not owner"}, status=400)
         shop, shop_created = Shop.objects.get_or_create(owner=profile, name=name)
         if address:
-            address_object = Address.objects.create(**address)
-            shop.address = address_object
+            shop.address_string = address
         if location:
             shop.location = location
         profile.emp_in_shop = shop
@@ -284,6 +283,7 @@ class UpdateAndVerifyBankAccount(APIView):
         
         account_number = request.data.get('account_number', False)
         ifsc = request.data.get('ifsc', False)
+        name = request.data.get('account_holder', False)
         profile = Profile.objects.get(user_id=request.user)
         if profile.role != 'emp':
             return JsonResponse({"status": "user is not employee"}, status=400)
@@ -293,7 +293,7 @@ class UpdateAndVerifyBankAccount(APIView):
             if bank_obj.exists() and len(bank_obj) == 1:
                 bank_obj = Bank.objects.get(ifsc=ifsc)
                 user_bank_account, user_bank_account_created = UserBankAccount.objects.get_or_create(
-                    user_id=request.user, account_number=account_number, bank=bank_obj)
+                    user_id=request.user, account_number=account_number, bank=bank_obj, name_at_bank=name)
                 if not bank_obj.imps:
                     return JsonResponse({"status": "bank does not support imps"}, status=422)
 

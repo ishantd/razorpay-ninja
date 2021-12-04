@@ -18,7 +18,7 @@ import StyleSheet from 'react-native-extended-stylesheet'
 import {axiosAuthorizedInstance as axiosY} from '../CustomAxios/CustomAxios'
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-
+import {  Snackbar } from 'react-native-paper';
 
 import {
     useFonts,
@@ -57,7 +57,7 @@ const Profile = () => {
     const [shopCode, setShopCode] = useState();
     const [accountHolder, setAccountHolder] = useState()
     const [img, setImage] = useState(null);
-
+    
     const getImgPermission = async () => {
         try{
             if (Platform.OS !== 'web') {
@@ -74,7 +74,7 @@ const Profile = () => {
     }
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+        let result = await ImagePicker.launchCameraAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,
           allowsEditing: true,
           aspect: [4, 3],
@@ -98,7 +98,7 @@ const Profile = () => {
             // const base64 = await FileSystem.readAsStringAsync(img, { encoding: 'base64' });
             // console.error(base64)
             let promises  = [];
-            const accountProfile = axiosY({
+            const accountProfile = await axiosY({
                 url : '/accounts/profiles/',
                 method : 'post',
                 data : {
@@ -108,7 +108,7 @@ const Profile = () => {
                 }
             })
 
-            const bank = axiosY({
+            const bank = await axiosY({
                 url : '/accounts/bank-account/',
                 method : 'post',
                 data : {
@@ -118,16 +118,17 @@ const Profile = () => {
                 }
             }) 
 
-            const shop = axiosY({
+            const shop = await axiosY({
                 url : '/accounts/join-shop/',
                 method : 'post',
                 data : {
                     shop_code : shopCode
                 }
             })
-            promises = [accountProfile, bank, shop]
+            // promises = [accountProfile, bank, shop]
 
-            const res = await Promise.all(promises);
+            // const res = await Promise.all(promises);
+            console.log(res)
         }
         catch(err){
 
