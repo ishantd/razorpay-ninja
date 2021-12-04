@@ -76,7 +76,7 @@ class ShopCRU(APIView):
     
     def get(self, request, *args, **kwargs):
         
-        shop = Shop.objects.get(owner=request.user)
+        shop = Shop.objects.get(owner=request.user.profile)
         # return JsonResponse({"status": "shop not found"}, status=400)
         
 
