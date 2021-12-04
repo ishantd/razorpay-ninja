@@ -13,11 +13,9 @@ const storeData = async (value) => {
     } catch (e) {
       // saving error
     }
-  }
-
+}
 
 export default function GAuth(props) {
-    
     const [accessT, setToken] = useState()
     const gLogin = async () => {
         try{
@@ -88,8 +86,8 @@ const classes = StyleSheet.create({
         backgroundColor : "#7d96e333",
         marginTop : Constants.statusBarHeight,
         backgroundColor : '#09153b',
-
     },
+
     button : {
         flexDirection : 'row',
         alignItems : 'center',
@@ -97,10 +95,9 @@ const classes = StyleSheet.create({
         // padding : 10,
         // paddingLeft : "0.5rem",
         borderRadius : "0.3rem",
-        elevation : 25,
         backgroundColor : "white",
-        
     },
+
     google : {
         fontSize : "1.3rem",
         color : "white",
@@ -110,14 +107,15 @@ const classes = StyleSheet.create({
         padding : "0.5rem",
         borderTopLeftRadius : "0.3rem",
         borderBottomLeftRadius : "0.3rem"
-        
     },
+
     img : {
         flex: 1,
         width: null,
         height: null,
         resizeMode: 'contain'
     },
+
     text : {
         height : "100%",
         color : "black",
@@ -131,17 +129,17 @@ const classes = StyleSheet.create({
         backgroundColor : 'white',
         
     },
+
     buttonContainer : {
         flex : 2,
         justifyContent : "center",
         alignItems : "center"
     },
+
     logo : {
-        // flex : 1,
         width : "20rem",
         height : "20rem",
         borderRadius : "6rem",
-        // backgroundColor : '#2649b6'
     }
 
 })
