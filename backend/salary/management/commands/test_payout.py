@@ -29,4 +29,3 @@ class Command(BaseCommand):
             if p.amount != 0 and p.date_of_every_month and profile.razorpay_fund_account_id:
                 r = RazorpayX(bank_account)
                 ptxn = r.send_payout()
-                print(ptxn)
