@@ -29,7 +29,7 @@ class PayoutCRU(APIView):
         user_id = request.query_params.get('user_id', False)
         user = request.user if not user_id else User.objects.get(id=user_id)
         
-        profile = Profile.objects.get(user=user)
+        profile = Profile.objects.get(user_id=user)
         
         payout = Payout.objects.get(employee_id=profile)
         payout_txns = PayoutTransaction.objects.filter(payout=payout).values()
