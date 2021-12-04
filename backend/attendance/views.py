@@ -143,7 +143,14 @@ class AttendanceCRUD(APIView):
                 atd.verified_face = p.verify_face()
                 atd.verified_location = p.verify_location()
                 atd.save()
-                return JsonResponse({"status": "success", "message": "Attendance out marked successfully"}, status=200)
+                if(atd.verified_face and atd.verified_location):
+                    return JsonResponse({"status": "success", "message": "Attendance out marked successfully"}, status=200)
+                elif not(atd.verified_face):
+                    return JsonResponse({"status": "error", "message": "Facial verification failed"}, status=200)
+                elif not(atd.verified_location):
+                    return JsonResponse({"status": "error", "message": "Location verification failed"}, status=200)
+                else:
+                    return JsonResponse({"status": "error", "message": "Location and Facial recognition failed"}, status=200)
             return JsonResponse({"status": "img not present"}, status=400)
         elif not todays_attendance.exists():
             location = f'{location["latitude"]}, {location["longitude"]}'
