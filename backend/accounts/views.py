@@ -343,8 +343,7 @@ class CustomerCRUD(APIView):
         email = request.data.get('email', False)
         phone = request.data.get('phone', False)
         try:
-            customer = Customer.objects.create(name=name)
-           
+            customer = Customer.objects.create(name = name)
             if address:
                 customer.address = address
             if location:
@@ -356,8 +355,8 @@ class CustomerCRUD(APIView):
             customer.save()
             return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
         except Exception as e:
-            return JsonResponse({"status": "bad input"}, status=400)
-            
+            return JsonResponse({"status": str("bad input : "+str(e))}, status=400)
+
     
     def get(self, request, *args, **kwargs):
         customers = Customer.objects.all()
