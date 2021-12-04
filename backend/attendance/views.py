@@ -128,7 +128,7 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='JPG')
+                img.save(img_io, format='jpeg')
                 atd = todays_attendance[0]
                 atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/jpg', name=f'{user.id}.jpg', size=img_io.tell, charset=None)
                 atd.attendance_time_out_location = location
@@ -148,7 +148,7 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='JPG')
+                img.save(img_io, format='jpeg')
                 atd = Attendance.objects.create(user=user, date=datetime.today().date(), attendance_time_in_location=location)
                 return JsonResponse({"status": "success", "message": "Attendance in marked successfully"}, status=200)
             return JsonResponse({"status": "img not present"}, status=400)
