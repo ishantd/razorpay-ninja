@@ -97,8 +97,6 @@ export default function App(){
         <Stack.Screen name="Auth" component={GAuth}/>
         <Stack.Screen name="Main" component={MainScreens}/>
 
-
-
       </Stack.Navigator>
 
     </NavigationContainer>

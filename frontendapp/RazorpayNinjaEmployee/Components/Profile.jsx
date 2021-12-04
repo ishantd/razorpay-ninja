@@ -88,19 +88,12 @@ const Profile = (props) => {
         });
         // console.error(result)
         if (!result.cancelled) {
-            setImage(result.uri);
+            setImage(result);
           }
     }
 
 
-    
 
-
-    const [visible, setVisible] = React.useState(false);
-
-    const onToggleSnackBar = () => setVisible(!visible);
-
-    const onDismissSnackBar = () => setVisible(false);
 
     const getData = async () => {
         try{
@@ -133,44 +126,57 @@ const Profile = (props) => {
     const submitData = async () => {
         try{
             console.log("Requested")
+            let accountProfile, bank, shop;
             // const base64 = await FileSystem.readAsStringAsync(img, { encoding: 'base64' });
             // console.error(base64)
             console.log(img)
             let promises  = [];
-            const accountProfile = await axiosY({
-                url : '/accounts/profiles/',
-                method : 'post',
-                data : {
-                    phone : phone,
-                    role : 'emp',
-                    profile_photo : img
-                }
-            })
-            console.log(accountProfile.data)
-            const bank = await axiosY({
-                url : '/accounts/bank-account/',
-                method : 'post',
-                data : {
-                    account_number : account,
-                    ifsc : ifsc,
-                    account_holder : accountHolder
-                }
-            }) 
+            if (img && phone){
+                 accountProfile = await axiosY({
+                    url : '/accounts/profiles/',
+                    method : 'post',
+                    data : {
+                        phone : phone,
+                        role : 'emp',
+                        profile_photo : img
+                    }
+                })
+            }
+            // console.log(accountProfile.data)
 
-            const shop = await axiosY({
-                url : '/accounts/join-shop/',
-                method : 'post',
-                data : {
-                    shop_code : shopCode
-                }
-            })
+
+            if (ifsc && account && accountHolder){
+                bank = await axiosY({
+                    url : '/accounts/bank-account/',
+                    method : 'post',
+                    data : {
+                        account_number : account,
+                        ifsc : ifsc,
+                        account_holder : accountHolder
+                    }
+                }) 
+            }
+
+
+            if (shopCode){
+                shop = await axiosY({
+                    url : '/accounts/join-shop/',
+                    method : 'post',
+                    data : {
+                        shop_code : shopCode
+                    }
+                })
+            }
             // promises = [accountProfile, bank, shop]
 
 
             
-            const res = await Promise.all(promises);
-            console.log(res)
-            onToggleSnackBar();
+            // const res = await Promise.all(promises);
+            
+
+
+            if (shop.data.status  === 'ok' || bank.data.status === 'ok' || accountProfile.data.status === 'ok')
+                props.navigation.navigate("Attendance")
         }
         catch(err){
             console.log(err)
@@ -215,7 +221,7 @@ const Profile = (props) => {
                     <View style={classes.section2}>
                     
                     <TouchableOpacity onPress = {pickImage}>
-                        <Image style={classes.logo} source={!img?require('../assets/placeholder.png'):{uri : img}}></Image>
+                        <Image style={classes.logo} source={!img?require('../assets/placeholder.png'):{uri : img.uri}}></Image>
                     </TouchableOpacity>
                     
                     <TextInput
