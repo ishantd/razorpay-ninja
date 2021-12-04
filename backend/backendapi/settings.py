@@ -29,8 +29,6 @@ def get_env_var(setting, configs=configs):
  except Exception as e:
      print ("some unexpected error occurred!", e)
     
-SECRET_KEY = 'django-insecure-u04vmfejq)zudsnik95^ot!#4^8aj*r(q$6g3@tmtf1#2*p%3e'
-
 SECRET_KEY = get_env_var("SECRET_KEY")
 
 DEBUG = get_env_var("DEBUG")
@@ -52,6 +50,8 @@ SEND_OTP = get_env_var("SEND_OTP")
 SEND_EMAIL = get_env_var("SEND_EMAIL")
 
 SEND_ERRORS_TO_SENTRY = get_env_var("SEND_ERRORS_TO_SENTRY")
+
+MAX_DISTANCE =  get_env_var("MAX_DISTANCE")
 
 if SEND_ERRORS_TO_SENTRY:
     sentry_sdk.init(
@@ -203,6 +203,12 @@ AWS_SNS_SECRET_ACCESS_KEY = AWS["SNS"]["ACCESS_KEY_SECRET"]
 AWS_SES_REGION_NAME = 'ap-south-1'
 AWS_DEFAULT_REGION_NAME = 'ap-south-1'
 AWS_SES_REGION_ENDPOINT = 'email.ap-south-1.amazonaws.com'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+AWS_S3_REGION_NAME = 'ap-south-1'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_STORAGE_BUCKET_NAME = 'rzphack'
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"

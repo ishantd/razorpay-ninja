@@ -20,6 +20,7 @@ from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAcco
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
 from attendance.models import Attendance
+from attendance.utils import ProcessAttendance
 
 import json
 import base64
@@ -111,6 +112,10 @@ class AttendanceCRUD(APIView):
                 atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{user.id}.png', size=img_io.tell, charset=None)
                 atd.attendance_time_out_location = location
                 atd.attendance_time_out = timezone.now()
+                atd.save()
+                p = ProcessAttendance(atd)
+                atd.verified_face = p.verify_face()
+                atd.verified_location = p.verify_location()
                 atd.save()
                 return JsonResponse({"status": "success", "message": "Attendance out marked successfully"}, status=200)
             return JsonResponse({"status": "img not present"}, status=400)

@@ -23,10 +23,9 @@ class Attendance(models.Model):
     verified_face = models.BooleanField(default=False)
     verified_location = models.BooleanField(default=False)
     
-def verify_attendance(sender, instance, created, **kwargs):
-    if not instance.attendance_processed:
-        p = ProcessAttendance(instance)
-        instance.verified_face = p.verify_face()
-        instance.verified_location = p.verify_location()
-        instance.attendance_processed = True
-        instance.save()
+
+        # p = ProcessAttendance(instance)
+        # instance.verified_face = p.verify_face()
+        # instance.verified_location = p.verify_location()
+        # instance.attendance_processed = True
+        # instance.save()

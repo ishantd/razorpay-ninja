@@ -7,6 +7,7 @@ import uuid
 
 from accounts.utils import random_string
 
+
 class State(models.Model):
     unique_id = models.IntegerField(default=0)
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -151,3 +152,14 @@ class PhoneOTP(models.Model):
 
     def __str__(self):
         return str(self.otp) + ' is sent to ' + str(self.phone)
+
+class Customer(models.Model):
+    phone_regex = RegexValidator(regex=r'^[6-9]\d{9}$', message ="Phone number must be entered in the format: '[6,7,8,9]xxxxxxxxx'. Approx 10 digits allowed.")
+    name = models.CharField(max_length=255, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    location = PlainLocationField(zoom=14, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
+    phone       = models.CharField(validators=[phone_regex], max_length=10, null=True)
+    phone_regex = RegexValidator( regex   =r'^\+?1?\d{4,14}$', message ="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.")

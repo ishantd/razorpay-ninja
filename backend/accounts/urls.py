@@ -12,4 +12,5 @@ urlpatterns = [
     path('profiles/', views.EmployeeCRUD.as_view(), name='profiles'),
     path('shop/', views.ShopCRU.as_view(), name='shop'),
     path('join-shop/', views.JoinShop.as_view(), name='join-shop'),
+    path('customer/', views.CustomerCRUD.as_view(), name='customer'),
 ]

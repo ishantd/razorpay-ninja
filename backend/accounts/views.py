@@ -16,9 +16,10 @@ from datetime import datetime, timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount
+from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount, Customer
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
+from accounts.rzpxapi import RazorpayX
 
 import json
 import base64
@@ -311,3 +312,59 @@ class UpdateAndVerifyBankAccount(APIView):
         if bank_account and len(bank_account) == 1:
             return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_account[0])}, status=200)
         return JsonResponse({"status": "bad input"}, status=400)
+
+
+class CustomerCRUD(APIView):
+    def post(self, request, *args, **kwargs):
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.create(
+                name=name, address=address, location=location, email=email, phone=phone)     
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        customers = Customer.objects.all()
+        return JsonResponse({"status": "success", "customers": [model_to_dict(customer) for customer in customers]}, status=200)
+    
+    def put(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            if name:
+                customer.name = name
+            if address:
+                customer.address = address
+            if location:
+                customer.location = location
+            if email:
+                customer.email = email
+            if phone:
+                customer.phone = phone
+            customer.save()
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    def delete(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            customer.delete()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    
+        
+        
