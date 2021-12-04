@@ -63,7 +63,7 @@ class AttendanceCRUD(APIView):
         shop = profile.emp_in_shop
         if not employee_id and profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
-        start_of_month = datetime.date.today().replace(day=1)
+        start_of_month = datetime.today().date().replace(day=1)
         data = {"status": "success", "attendances": []}
         if employee_id:
             attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
