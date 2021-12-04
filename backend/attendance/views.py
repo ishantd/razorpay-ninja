@@ -66,20 +66,18 @@ class AttendanceCRUD(APIView):
         if not employee_id and user_profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
         start_of_month = datetime.today().date().replace(day=1)
-        data = {"status": "success", "attendances": []}
+        data = {"status": "success"}
         if employee_id:
             attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
+            atd = {}
             for attendance in attendances:
-                atd = {
-                    attendance.date.strftime("%Y-%m-%d"): {
+                atd[attendance.date.strftime("%Y-%m-%d")] = {
                         'selectedColor': '#2CDD93'
                         if (attendance.verified_face and attendance.verified_location)
                         else '#FF9700',
                         'selected': True,
                     }
-                }
-
-                data["attendances"].append(atd)
+            data["attendances"] = atd
             empuser = User.objects.get(id=employee_id)
             empprofile = Profile.objects.get(user_id=empuser)
             payoutemp = Payout.objects.get(employee_id=empprofile)
