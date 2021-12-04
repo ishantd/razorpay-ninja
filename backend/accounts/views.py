@@ -4,7 +4,6 @@ from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.forms import model_to_dict
-from backend.accounts.models import Customer
 
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -17,9 +16,10 @@ from datetime import datetime, timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount
+from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount, Customer
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
+from accounts.rzpxapi import RazorpayX
 
 import json
 import base64
@@ -346,11 +346,16 @@ class CustomerCRUD(APIView):
         phone = request.data.get('phone', False)
         try:
             customer = Customer.objects.get(id=customer_id)
-            customer.name = name
-            customer.address = address
-            customer.location = location
-            customer.email = email
-            customer.phone = phone
+            if name:
+                customer.name = name
+            if address:
+                customer.address = address
+            if location:
+                customer.location = location
+            if email:
+                customer.email = email
+            if phone:
+                customer.phone = phone
             customer.save()
             return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
         except Exception as e:
