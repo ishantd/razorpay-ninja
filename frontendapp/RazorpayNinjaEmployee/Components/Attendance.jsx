@@ -114,11 +114,10 @@ const Attendance = (props) => {
                 type : 'absent',
                 location : [location.coords.latitude, location.coords.longitude]
             }
-            const res = await axiosY({
-                method : 'post',
-                url : '/attendance/',
-                data : data
-            })
+            const id = await axiosY.get('/auth/user/');
+            const response = await axiosY.get(`/attendance/absent/?user_id=${id.data.pk}`);
+            setAttendanceMarked(true);
+            
         }
         catch(err){
             console.error(err)
@@ -155,7 +154,7 @@ const Attendance = (props) => {
         const te =`${new Date().toISOString().split('T')[0]}`
         const newDates = markedDates;
         newDates[te] = { marked: true, dotColor: 'blue'}
-        console.error(newDates)
+
         setMarkedDates(newDates);
         
 
@@ -173,7 +172,7 @@ const Attendance = (props) => {
                 data : data
             })
             setAttendanceMarked(true);
-            setLoading(false)
+            setLoading(false);
         }
         catch(err){
             console.error(err)
@@ -188,7 +187,7 @@ const Attendance = (props) => {
         getLocation()
         getImgPermission()
         getAttendanceData()
-    },[])
+    },[attendanceMarked])
 
     const data = [0.4]
     
@@ -197,7 +196,7 @@ const Attendance = (props) => {
     var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
    
-
+    
     
 
 
@@ -257,12 +256,12 @@ const Attendance = (props) => {
 
                         onPress={MarkAbsent}
                         >
-                            <Text style={{...classes.mark, backgroundColor : '#102461',marginBottom : 12, color : 'white'}}>Mark Absent</Text>
+                            <Text style={{...classes.mark, backgroundColor : '#102461',marginBottom : 12, color : 'white'}}>{"Mark Absent"}</Text>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback
                             onPress={MarkPresent}
                         >
-                            {loading?<ActivityIndicator size="large" color="#102461"></ActivityIndicator> : <Text style={{...classes.mark, color : attendanceMarked?"white":"#102461", backgroundColor : attendanceMarked?"green":"white"}}>{attendanceMarked?"Present":"Mark Present"}</Text>}
+                            {loading?<ActivityIndicator size="large" color="#102461"></ActivityIndicator> : <Text style={classes.mark}>{attendanceMarked?"Marked":"Mark Present"}</Text>}
                         </TouchableWithoutFeedback>
                         
                     </View>
