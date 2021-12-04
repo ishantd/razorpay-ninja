@@ -299,6 +299,11 @@ class UpdateAndVerifyBankAccount(APIView):
                 user_bank_account.verified = True
                 user_bank_account.verified_timestamp = datetime.now()
                 user_bank_account.save()
+                r = RazorpayX(user_bank_account)
+                payout_data = r.init_user_for_payouts()
+                if payout_data:
+                    profile.razorpay_contact_id = payout_data['contact_id']
+                    profile.razorpay_fund_account_id = payout_data['fund_account_id']
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
         
