@@ -26,6 +26,8 @@ import {
     Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 
+import {axiosAuthorizedInstance as axiosY} from '../CustomAxios/CustomAxios'
+
 
 const Attendance = (props) => {
     let [fontsLoaded] = useFonts({
@@ -48,7 +50,7 @@ const Attendance = (props) => {
     }
 
 
-    const [img, setImg ] = useState(null)
+    const [img, setImage ] = useState(null)
 
     const getImgPermission = async () => {
       try{
@@ -75,7 +77,21 @@ const Attendance = (props) => {
       });
       // console.error(result)
       if (!result.cancelled) {
-          setImage(result.uri);
+          return result;
+        }
+    }
+
+    const [attendanceData, setAttendanceData] = useState([]);
+
+    const getAttendanceData = async () => {
+        try{
+            const id = await axiosY.get('/auth/user/');
+            const response = await axiosY.get(`/attendance/employee/?employee_id=${id.data.pk}`);
+            console.error(response.data)
+            setAttendanceData(response.data)
+        }
+        catch(err){
+            console.log(err)
         }
     }
 
@@ -90,8 +106,32 @@ const Attendance = (props) => {
         }
     }   
 
+    const MarkAbsent = async () => {
+        try{
+            const data = {
+                type : 'absent',
+                location : [location.coords.latitude, location.coords.longitude]
+            }
+            const res = await axiosY({
+                method : 'post',
+                url : '/attendance/',
+                data : data
+            })
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
+    const [markedDates, setMarkedDates] = useState({
+        '2021-12-01': { marked: true, dotColor: 'blue'},
+        '2021-12-02': {marked: true, dotColor: 'red'},
+        '2021-12-03': {marked: true, dotColor: 'red', activeOpacity: 0},
+        // '2021-12-04': {disabled: true, disableTouchEvent: true}
+    }); 
+    
 
     const getLocation = async () => {
         try{
@@ -110,11 +150,43 @@ const Attendance = (props) => {
         }
     }
 
+    const MarkPresent = async () => {
+        
+        const te =` ${new Date().toISOString().split('T')[0]}`
+        const newDates = {
+            ...markedDates
+        };
+        newDates[te] = { marked: true, dotColor: 'blue'}
+        setMarkedDates(
+            newDates
+        )
+
+        try{
+            const ima = await pickImage()
+            setImage(ima.uri)
+            const data = {
+                type : 'present',
+                location : {latitude : `${location.coords.latitude}`, longitude : `${location.coords.longitude}`},
+                live_image : ima.base64,
+            }
+            const res = await axiosY({
+                method : 'post',
+                url : '/attendance/',
+                data : data
+            })
+            
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+
 
 
     useEffect(()=>{
         getLocation()
         getImgPermission()
+        getAttendanceData()
     },[])
 
     const data = [0.4]
@@ -123,12 +195,8 @@ const Attendance = (props) => {
     var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
     var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-    const markedDates = {
-        '2021-12-01': { marked: true, dotColor: 'blue'},
-        '2021-12-02': {marked: true, dotColor: 'red'},
-        '2021-12-03': {marked: true, dotColor: 'red', activeOpacity: 0},
-        // '2021-12-04': {disabled: true, disableTouchEvent: true}
-      }
+   
+
     
 
 
@@ -182,14 +250,16 @@ const Attendance = (props) => {
                         <Text
                             style={classes.textBubblePositive}
                         >Days Present : 8</Text>
-                        <Text
-                            style={classes.textBubbleNegative}
-                        >Days Absent : 12</Text>
                         <TouchableWithoutFeedback 
 
-                            onPress={pickImage}
+                        onPress={MarkAbsent}
                         >
-                            <Text style={classes.mark}>Mark Today</Text>
+                            <Text style={{...classes.mark, backgroundColor : '#102461',marginBottom : 12, color : 'white'}}>Mark Absent</Text>
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                            onPress={MarkPresent}
+                        >
+                            <Text style={classes.mark}>Mark Present</Text>
                         </TouchableWithoutFeedback>
                         
                     </View>
