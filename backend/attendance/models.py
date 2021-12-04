@@ -12,6 +12,7 @@ def attendance_selfie_path(instance):
 class Attendance(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     shop = models.ForeignKey(Shop, null=True, blank=True, on_delete=models.CASCADE)
+    absent = models.BooleanField(default=False)
     date = models.DateField(default=timezone.now)
     attendance_time_in = models.DateTimeField(default=timezone.now)
     attendance_time_out = models.DateTimeField(null=True, blank=True)

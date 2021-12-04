@@ -71,10 +71,14 @@ class AttendanceCRUD(APIView):
             attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
             atd = {}
             for attendance in attendances:
+                if (attendance.verified_face and attendance.verified_location):
+                    selectedColor = '#2CDD93'
+                elif attendance.absent:
+                    selectedColor = '#D44333'
+                else:
+                    selectedColor = '#FF9700'
                 atd[attendance.date.strftime("%Y-%m-%d")] = {
-                        'selectedColor': '#2CDD93'
-                        if (attendance.verified_face and attendance.verified_location)
-                        else '#FF9700',
+                        'selectedColor': selectedColor,
                         'selected': True,
                     }
             data["attendances"] = atd
@@ -116,7 +120,9 @@ class AttendanceCRUD(APIView):
             return JsonResponse({"status": "error", "message": "Location and atd type is required"}, status=400)
         
         todays_attendance = Attendance.objects.filter(user=user, date=datetime.today().date())
-        if (todays_attendance.exists() and len(todays_attendance)==1) and todays_attendance[0].attendance_time_out:
+        if (todays_attendance.exists() and len(todays_attendance)==1) and todays_attendance[0].absent:
+            return JsonResponse({"status": "error", "message": "You are already absent"}, status=400)
+        elif (todays_attendance.exists() and len(todays_attendance)==1) and todays_attendance[0].attendance_time_out:
             return JsonResponse({"status": "error", "message": "You have already marked your attendance today"}, status=400)
         # this below is time out attendance logic 
         elif (todays_attendance.exists() and len(todays_attendance)==1) and not (todays_attendance[0].attendance_time_out):
@@ -153,3 +159,15 @@ class AttendanceCRUD(APIView):
             return JsonResponse({"status": "img not present"}, status=400)
         else:
             return JsonResponse({"status": "fail"}, status=400)
+
+class MarkAbsent(APIView):
+    
+    def get(self, request, *args, **kwargs):
+        user_id = request.data.get("user_id", False)
+        
+        atd = Attendance.objects.get_or_create(user__id=user_id, date=datetime.today().date())
+        atd.absetnt = True
+        
+        atd.save()
+        
+        return JsonResponse({"status": "success", "message": "Marked Absent"}, status=200)
