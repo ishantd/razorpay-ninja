@@ -256,7 +256,7 @@ const Attendance = (props) => {
 
                         onPress={MarkAbsent}
                         >
-                            <Text style={{...classes.mark, backgroundColor : '#102461',marginBottom : 12, color : 'white'}}>{attendanceMarked?"Marked":"Mark Absent"}</Text>
+                            <Text style={{...classes.mark, backgroundColor : '#102461',marginBottom : 12, color : 'white'}}>{"Mark Absent"}</Text>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback
                             onPress={MarkPresent}
