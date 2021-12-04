@@ -92,6 +92,34 @@ const Profile = () => {
         getImgPermission();
     })
 
+
+    const [visible, setVisible] = React.useState(false);
+
+    const onToggleSnackBar = () => setVisible(!visible);
+
+    const onDismissSnackBar = () => setVisible(false);
+
+    const getData = async () => {
+        try{
+
+            const accountProfile = await axiosY({
+                method : 'get',
+                url : '/accounts/profiles/'
+            });
+            setPhone(accountProfile.data.phone)
+            setImage(accountProfile.data.profile_photo)
+
+
+
+            const bankDeets = await axiosY({
+                method : 'get',
+                url : '/accounts/bank-account/'
+            })
+            console.log(bankDeets)
+
+        }
+    }
+
     const submitData = async () => {
         try{
 
@@ -129,6 +157,7 @@ const Profile = () => {
 
             // const res = await Promise.all(promises);
             console.log(res)
+            onToggleSnackBar()
         }
         catch(err){
 
@@ -219,7 +248,17 @@ const Profile = () => {
                     <Button onPress={submitData} mode="contained" color="#102461" style={{width : "96%", alignSelf : "center"}}>Update Details</Button>
                 </View>
             </View>
-
+            <Snackbar
+                visible={visible}
+                onDismiss={onDismissSnackBar}
+                action={{
+                label: 'Undo',
+                onPress: () => {
+                    // Do something
+                },
+                }}>
+                Hey there! I'm a Snackbar.
+            </Snackbar>
             </KeyboardAwareScrollView>
     )
 }

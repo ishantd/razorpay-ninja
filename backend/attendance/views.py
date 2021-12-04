@@ -57,6 +57,9 @@ class AttendanceCRUD(APIView):
         employee_id = request.query_params.get('employee_id', False)
         user = request.user
         profile = Profile.objects.filter(user_id=user)
+        profile = profile[0] if profile.exists() else None
+        if not profile:
+            return JsonResponse({'status': 'error'}, status=400)
         shop = profile.emp_in_shop
         if not employee_id and profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)

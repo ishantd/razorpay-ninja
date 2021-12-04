@@ -30,7 +30,7 @@ class RazorpayX:
             "name": f'{self.user.first_name} {self.user.last_name}',
             "email": self.user.email,
             "contact": self.user_profile.phone,
-            "type": self.user_profile.role,
+            "type": "employee",
             "reference_id": str(self.user.id)
         }
         return requests.post(
@@ -63,12 +63,15 @@ class RazorpayX:
     def init_user_for_payouts(self):
         data = {}
         user_contact = self.create_contact()
+        print(user_contact.json())
+        print(user_contact.status_code)
         if user_contact.status_code == 200:
             data["contact_id"] = user_contact.json()["id"]
+            print(data)
             user_fund = self.create_fund_account(data["contact_id"])
-            
+            print(user_fund.json())
             if user_fund.status_code == 200:
                 data["fund_account_id"] = user_fund.json()["id"]
-                
+                print(data)
                 return data
         return None

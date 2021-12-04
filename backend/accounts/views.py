@@ -143,12 +143,14 @@ class EmployeeCRUD(APIView):
     
     def get(self, request, *args, **kwargs):
         profile = Profile.objects.get(user_id = request.user)
+        bank_account = UserBankAccount.objects.filter(user_id = request.user)
         data = {
             "name": f'{profile.user_id.first_name} {profile.user_id.last_name}',
             "phone": profile.phone,
             "profile_photo": profile.profile_picture.url if profile.profile_picture else None,
             "role": profile.role,
             "shop": model_to_dict(profile.emp_in_shop) if profile.emp_in_shop else None,
+            "bank_account": model_to_dict(bank_account[0]) if bank_account.exists() else None,
         }
             
         return JsonResponse({"status": "ok", "data":data }, status=200)
@@ -303,8 +305,11 @@ class UpdateAndVerifyBankAccount(APIView):
                 r = RazorpayX(user_bank_account)
                 payout_data = r.init_user_for_payouts()
                 if payout_data:
+                    print(payout_data)
                     profile.razorpay_contact_id = payout_data['contact_id']
                     profile.razorpay_fund_account_id = payout_data['fund_account_id']
+                    user_bank_account.razorpay_processed = True
+                    user_bank_account.save()
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
         
