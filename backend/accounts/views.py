@@ -64,9 +64,13 @@ class ShopCRU(APIView):
         profile.emp_in_shop = shop
         profile.save()
         shop.save()
-        data = model_to_dict(profile)
-        if profile.profile_picture:
-            data['profile_picture'] = profile.profile_picture.url if data.profile_picture else None
+        data = {
+            "name": f'{profile.user_id.first_name} {profile.user_id.last_name}',
+            "role": profile.role,
+            "shop": model_to_dict(profile.emp_in_shop),
+            "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
+            "phone": profile.phone,
+        }
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop), "profile_data":data}, status=200)
     
@@ -139,9 +143,13 @@ class EmployeeCRUD(APIView):
         print(profile.phone)
         profile.save()
         print(profile.id)
-        data = model_to_dict(profile)
-        if profile.profile_picture:
-            data['profile_picture'] = profile.profile_picture.url if data.profile_picture else None
+        data = {
+            "name": f'{profile.user_id.first_name} {profile.user_id.last_name}',
+            "role": profile.role,
+            "shop": model_to_dict(profile.emp_in_shop),
+            "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
+            "phone": profile.phone,
+        }
         return JsonResponse({"status": "ok", "data": data}, status=200)
     
     def get(self, request, *args, **kwargs):

@@ -26,11 +26,6 @@ class ProcessAttendance:
         distance = int(haversine((in_location.latitude, in_location.longitude), (out_location.latitude, out_location.longitude), unit=Unit.METERS))
         return distance <= settings.MAX_DISTANCE
 
-
-import boto3
-from django.conf import settings
-
-
 def compare_faces_for_checkin(target, source):
     response = client.compare_faces(
     SourceImage={
