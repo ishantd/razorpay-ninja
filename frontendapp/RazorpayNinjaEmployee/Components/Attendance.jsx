@@ -41,8 +41,10 @@ const Attendance = (props) => {
         Roboto_700Bold,
     });
 
-    const [loading, setLoading] = useState(false);
+    const [present, setDaysPresent] = useState(0)
 
+    const [loading, setLoading] = useState(false);
+    const [pageLoad, setPageLoad] = useState(false)
     const chartConfig = {
         backgroundGradientFrom: 'white',
         backgroundGradientTo: 'white',
@@ -79,32 +81,32 @@ const Attendance = (props) => {
       if (!result.cancelled) {
           return result;
         }
-    }
-
+    }   
+    const [markedDates, setMarkedDates] = useState({
+        
+    }); 
+    const [attendanceMarked, setAttendanceMarked] = useState(false)
     const [attendanceData, setAttendanceData] = useState([]);
 
     const getAttendanceData = async () => {
+        setPageLoad(true)
         try{
             const id = await axiosY.get('/auth/user/');
-            const response = await axiosY.get(`/attendance/employee/?employee_id=${id.data.pk}`);
-            console.error(response.data)
-            setAttendanceData(response.data)
+            const response = await axiosY.get(`/attendance/?user_id=${id.data.pk}`);
+            const attendances = response.data.attendances
+            setMarkedDates({...attendances})
+            setPageLoad(false)
+            
         }
         catch(err){
             console.log(err)
+            setPageLoad(false)
+
+        }
+        finally{
+            setPageLoad(false)
         }
     }
-
-    const getRandomUser =  async () => {
-        
-        try{
-            const response = await axios('https://randomuser.me/api/');
-            setUser(response.data.results)
-        }
-        catch(err){
-            console.error(err)
-        }
-    }   
 
     const MarkAbsent = async () => {
         try{
@@ -125,12 +127,7 @@ const Attendance = (props) => {
 
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
-    const [markedDates, setMarkedDates] = useState({
-        '2021-12-01': { marked: true, dotColor: 'blue'},
-        '2021-12-02': {marked: true, dotColor: 'red'},
-        '2021-12-03': {marked: true, dotColor: 'red', activeOpacity: 0},
-        // '2021-12-04': {disabled: true, disableTouchEvent: true}
-    }); 
+    
     
 
     const getLocation = async () => {
@@ -151,15 +148,16 @@ const Attendance = (props) => {
     }
 
     const MarkPresent = async () => {
+
+        if (attendanceMarked === true) return;
+
         setLoading(true)
-        const te =` ${new Date().toISOString().split('T')[0]}`
-        const newDates = {
-            ...markedDates
-        };
+        const te =`${new Date().toISOString().split('T')[0]}`
+        const newDates = markedDates;
         newDates[te] = { marked: true, dotColor: 'blue'}
-        setMarkedDates(
-            newDates
-        )
+        console.error(newDates)
+        setMarkedDates(newDates);
+        
 
         try{
             const ima = await pickImage()
@@ -174,6 +172,7 @@ const Attendance = (props) => {
                 url : '/attendance/',
                 data : data
             })
+            setAttendanceMarked(true);
             setLoading(false)
         }
         catch(err){
@@ -210,6 +209,8 @@ const Attendance = (props) => {
 
     return (
         <View style={classes.container}>
+            
+            {!pageLoad?<>
             <View style={classes.section1}>
                 <Text
                     style={classes.topText}
@@ -226,6 +227,8 @@ const Attendance = (props) => {
                     minDate = {firstDay}
                     maxDate = {lastDay}
                     markedDates = {markedDates}
+                    disableArrowLeft ={true}
+                    disableArrowRight ={true}
                 />
                 </View>
             </View>
@@ -249,9 +252,7 @@ const Attendance = (props) => {
                     >Attendance Percentage</Text>
                     </View>
                     <View style={classes.card4}>
-                        <Text
-                            style={classes.textBubblePositive}
-                        >Days Present : 8</Text>
+                        
                         <TouchableWithoutFeedback 
 
                         onPress={MarkAbsent}
@@ -261,12 +262,13 @@ const Attendance = (props) => {
                         <TouchableWithoutFeedback
                             onPress={MarkPresent}
                         >
-                            {loading?<ActivityIndicator size="large" color="#102461"></ActivityIndicator> : <Text style={classes.mark}>Mark Present</Text>}
+                            {loading?<ActivityIndicator size="large" color="#102461"></ActivityIndicator> : <Text style={{...classes.mark, color : attendanceMarked?"white":"#102461", backgroundColor : attendanceMarked?"green":"white"}}>{attendanceMarked?"Present":"Mark Present"}</Text>}
                         </TouchableWithoutFeedback>
                         
                     </View>
                 </View>
-            </View>
+            </View></>:<ActivityIndicator size="large" color="#102461"></ActivityIndicator>}
+            
         </View>
     )
 }

@@ -171,7 +171,7 @@ class EmployeeCRUD(APIView):
         if(employee_id==False):
             return JsonResponse({"status": "User id is required"}, status=400)
         profile = Profile.objects.get(user_id__id=employee_id)
-        profile.shop = None
+        profile.emp_in_shop = None
         profile.save()
         return JsonResponse({"status": "ok"}, status=200)
     
