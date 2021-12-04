@@ -1,6 +1,7 @@
 # Ninja with RazorpayX
 ### The one stop solution for all your small business requirements
-
+[Link to Folder] (https://drive.google.com/drive/folders/156TW119TXbUJcNasgint1GFpGE-KPUTx?usp=sharing)
+[Presentation ] (https://docs.google.com/presentation/d/1xu28FhAo0QxlNSenNm_fAjdy0DuLxptFFIioaACzdfs/edit?usp=sharing)
 
 ## The Problem at Hand
 ### The devastating impacts of the pandemic has uprooted many a business and reduced the enterprising enthusiasm worldwide. Despite all of the shortcomings , brave business owners carry on following their passion and find ways to flourish. We support their enterprising spirit and intend to bring them the best technological solution to lift the heavy weight of their shoulders. After extensive research and consultation we have understood that among all the hardships that small businesses experience such as stock keeping, maintaining customers , maintaining employees and budgeting to find a proper turnover, the most recurring issues come with maintaining track of their employees and maintaining meaningful customer relations. We believe that these 2 are issues that can be easily automated and the Small Enterprises can focus more of their attention in business. The
@@ -36,9 +37,5 @@
 ![Alt text](/assets/empAttendance.jpeg)
 ![Alt text](/assets/empPayroll.jpeg)
 
-## Resource Diagram
-
-
-![png](https://user-images.githubusercontent.com/54077095/144720558-5483a634-707f-4fb0-81ba-80fd6f06f6a8.png)
 
 
