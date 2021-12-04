@@ -308,8 +308,6 @@ class UpdateAndVerifyBankAccount(APIView):
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
         
-        # create razorpay accounts
-        
         return JsonResponse({"status": "bad input"}, status=400)
     
     def get(self, request, *args, **kwargs):
