@@ -81,7 +81,7 @@ class AttendanceCRUD(APIView):
                 data["attendances"].append(atd)
             empuser = User.objects.get(id=employee_id)
             empprofile = Profile.objects.filter(user_id=empuser)
-            payoutemp, payoutemp_created = Payout.objects.get_or_create(employee_id=empprofile)
+            payoutemp = Payout.objects.get(employee_id=empprofile)
             data["employee_data"] = {
                             "name": f'{empuser.first_name} {empuser.last_name}',
                             "user_id": empuser.id,
@@ -89,7 +89,7 @@ class AttendanceCRUD(APIView):
                             "shop": model_to_dict(empprofile.emp_in_shop),
                             "emp_id": empprofile.id,
                             "profile_photo": empprofile.profile_picture.url if emp.profile_picture else None,
-                            "payout": model_to_dict(payoutemp) if not payoutemp_created else None}
+                            "payout": model_to_dict(payoutemp)}
         if not employee_id:
             empprofiles = Profile.objects.all()
             data["employee_data"] = []
