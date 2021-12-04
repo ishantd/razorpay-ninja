@@ -53,6 +53,8 @@ SEND_EMAIL = get_env_var("SEND_EMAIL")
 
 SEND_ERRORS_TO_SENTRY = get_env_var("SEND_ERRORS_TO_SENTRY")
 
+MAX_DISTANCE =  get_env_var("MAX_DISTANCE")
+
 if SEND_ERRORS_TO_SENTRY:
     sentry_sdk.init(
         dsn="https://f32a6be9ba604662ae5e7d617a3eacde@o1082572.ingest.sentry.io/6091252",
