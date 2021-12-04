@@ -91,7 +91,7 @@ function EmployeeDetails (props) {
                     <Text style={styles.headerTextDetails}>Next payout of {newAmount}₹ on {months[(new Date().getMonth() + 1) % 12]} {newDate}</Text>
                 </View>
             </View>
-            <Calendar onDayPress={(day) => { if (day.timestamp <= + new Date()) navigation.navigate('Attendance', { date: day.dateString, id: props.route.params.id }); }}
+            <Calendar /*onDayPress={(day) => { if (day.timestamp <= + new Date()) navigation.navigate('Attendance', { date: day.dateString, id: props.route.params.id }); }}*/
                 markedDates={attendance}
                 theme={{
                     textDayFontWeight: '600',
