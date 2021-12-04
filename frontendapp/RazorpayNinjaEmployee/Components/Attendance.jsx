@@ -4,6 +4,8 @@ import StyleSheet from 'react-native-extended-stylesheet'
 import AppLoading from 'expo-app-loading';
 import Constants from 'expo-constants'
 import * as Location from 'expo-location';
+import * as ImagePicker from 'expo-image-picker'
+
 
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import {
