@@ -28,7 +28,7 @@ function Employees (props) {
             method : 'get',
             url : '/attendance/',
         }
-        axiosAuthorizedInstance(requestOptions).then((response) => { console.log(response) }).catch((error) => { console.error(error) });
+        axiosAuthorizedInstance(requestOptions).then((response) => { console.log(response.data) }).catch((error) => { console.error(error) });
     }
 
     useEffect(() => {

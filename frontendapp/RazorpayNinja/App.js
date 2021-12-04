@@ -15,7 +15,6 @@ import Shop from './Components/Shop';
 import { useFonts } from 'expo-font';
 import { Sora_600SemiBold } from '@expo-google-fonts/sora';
 import { Roboto_400Regular } from '@expo-google-fonts/roboto';
-import GAuth from './Components/GoogleAuth';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginPage from './Components/LoginPage';
@@ -53,9 +52,9 @@ const AppScreens = () => {
 			headerShown: true,
 		  tabBarShowLabel: false,  
 	  	})}>
+			<Tab.Screen name="Shop" component={Shop}/>
 		  	<Tab.Screen name="Employees" component={EmployeeScreens} options={{ headerShown: false }}/>
 		  	<Tab.Screen name="Customers" component={Customers}/>
-		  	<Tab.Screen name="Shop" component={Shop}/>
 		</Tab.Navigator>
   	);
 }
@@ -68,8 +67,9 @@ export default function App() {
 
   	useEffect(() => {
     	async function fetchValue() {    
-      		//const token = await AsyncStorage.getItem('key');
-      		//if (token) { setDefaultScreen('AppScreens'); }
+      		const token = await AsyncStorage.getItem('key');
+			const shop = await AsyncStorage.getItem('shop');
+      		if (token) { shop ? setDefaultScreen('AppScreens') : setDefaultScreen('ShopOnboarding') }
 
       		setLoaded(true);
     	}
