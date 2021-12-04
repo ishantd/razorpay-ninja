@@ -34,9 +34,7 @@ function LoginPage (props) {
                     method : 'get',
                     url : '/accounts/shop/',
                 }
-                axiosAuthorizedInstance(requestOptions).then((response) => {
-                    console.log(response.data);
-                }).catch((error) => { console.log(error); })
+                axiosAuthorizedInstance(requestOptions).then((response) => { storeData('shop', JSON.stringify(response.data.data)); navigation.navigate('AppScreens'); }).catch((error) => navigation.navigate('ShopOnboarding'));
             })}).catch((error) => { console.error(error); });
         } 
         catch(error) { console.error(error) }

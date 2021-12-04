@@ -51,9 +51,9 @@ function Shop (props) {
                 </View>
             </View>
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
+                {/*}<TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
                     <Text style={styles.buttonText}>Edit Shop Details</Text>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
                 <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed} onPress={() => logOut()}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>

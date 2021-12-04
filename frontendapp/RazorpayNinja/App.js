@@ -19,6 +19,7 @@ import { Roboto_400Regular } from '@expo-google-fonts/roboto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginPage from './Components/LoginPage';
 import ShopOnboarding from './Components/ShopOnboarding';
+import Attendance from './Components/Attendance';
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
@@ -28,6 +29,7 @@ const EmployeeScreens = () => {
 		<Stack.Navigator>
 			<Stack.Screen name="Employee" component={Employees} options={{ title: 'Manage Employees' }}/>
 			<Stack.Screen name="EmployeeDetails" component={EmployeeDetails} options={{ title: 'Employee Details' }}/>
+			<Stack.Screen name="Attendance" component={Attendance} options={{ title: 'Attendance Details' }}/>
       	</Stack.Navigator>
 	)
 }
