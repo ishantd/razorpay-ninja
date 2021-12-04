@@ -189,6 +189,7 @@ class AttendanceDetail(APIView):
             atd = Attendance.objects.filter(user__id=user_id, date=date_object)
             if atd.exists() and len(atd) == 1:
                 a = atd[0]
+                apr = ProcessAttendance(a)
                 data = {
                     "status": "success",
                     "attendance_time_in_location": a.attendance_time_in_location,
@@ -199,7 +200,8 @@ class AttendanceDetail(APIView):
                     "date": a.date.strftime("%Y-%m-%d"),
                     "verified_face": a.verified_face,
                     "verified_location": a.verified_location,
-                    "attendance_processed": a.attendance_processed
+                    "attendance_processed": a.attendance_processed,
+                    "distance": apr.get_distance(),
                 }
                 return JsonResponse({"status": "ok", "data": data}, status=200)
         return JsonResponse({"status": "error", "message": "User not found"}, status=400)
