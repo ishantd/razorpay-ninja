@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
-import { View, Text, ScrollView,TouchableWithoutFeedback } from 'react-native'
+import { View, Text, ScrollView,TouchableWithoutFeedback,ActivityIndicator } from 'react-native'
 import StyleSheet from 'react-native-extended-stylesheet'
 import AppLoading from 'expo-app-loading';
 import Constants from 'expo-constants'
@@ -41,7 +41,7 @@ const Attendance = (props) => {
         Roboto_700Bold,
     });
 
-    
+    const [loading, setLoading] = useState(false);
 
     const chartConfig = {
         backgroundGradientFrom: 'white',
@@ -151,7 +151,7 @@ const Attendance = (props) => {
     }
 
     const MarkPresent = async () => {
-        
+        setLoading(true)
         const te =` ${new Date().toISOString().split('T')[0]}`
         const newDates = {
             ...markedDates
@@ -167,17 +167,19 @@ const Attendance = (props) => {
             const data = {
                 type : 'present',
                 location : {latitude : `${location.coords.latitude}`, longitude : `${location.coords.longitude}`},
-                live_image : ima.base64,
+                live_image : `data:image/jpg;base64,${ima.base64}`,
             }
             const res = await axiosY({
                 method : 'post',
                 url : '/attendance/',
                 data : data
             })
-            
+            setLoading(false)
         }
         catch(err){
             console.error(err)
+            setLoading(false)
+
         }
     }
 
@@ -259,7 +261,7 @@ const Attendance = (props) => {
                         <TouchableWithoutFeedback
                             onPress={MarkPresent}
                         >
-                            <Text style={classes.mark}>Mark Present</Text>
+                            {loading?<ActivityIndicator size="large" color="#102461"></ActivityIndicator> : <Text style={classes.mark}>Mark Present</Text>}
                         </TouchableWithoutFeedback>
                         
                     </View>

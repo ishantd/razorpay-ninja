@@ -32,6 +32,7 @@ from django.utils import timezone
 from salary.models import Payout
 
 def decodeUserImage(data):
+    
     try:
         data = base64.b64decode(data.split(',')[1])
         buf = io.BytesIO(data)
@@ -65,20 +66,18 @@ class AttendanceCRUD(APIView):
         if not employee_id and user_profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
         start_of_month = datetime.today().date().replace(day=1)
-        data = {"status": "success", "attendances": []}
+        data = {"status": "success"}
         if employee_id:
             attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
+            atd = {}
             for attendance in attendances:
-                atd = {
-                    attendance.date.strftime("%Y-%m-%d"): {
+                atd[attendance.date.strftime("%Y-%m-%d")] = {
                         'selectedColor': '#2CDD93'
                         if (attendance.verified_face and attendance.verified_location)
                         else '#FF9700',
                         'selected': True,
                     }
-                }
-
-                data["attendances"].append(atd)
+            data["attendances"] = atd
             empuser = User.objects.get(id=employee_id)
             empprofile = Profile.objects.get(user_id=empuser)
             payoutemp = Payout.objects.get(employee_id=empprofile)
@@ -112,7 +111,8 @@ class AttendanceCRUD(APIView):
         attendance_type = request.data.get('type', False)
         location = request.data.get('location', False)
         user = request.user
-        if not location and attendance_type:
+        
+        if not (location and attendance_type):
             return JsonResponse({"status": "error", "message": "Location and atd type is required"}, status=400)
         
         todays_attendance = Attendance.objects.filter(user=user, date=datetime.today().date())
@@ -127,9 +127,9 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='PNG')
+                img.save(img_io, format='jpeg')
                 atd = todays_attendance[0]
-                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{user.id}.png', size=img_io.tell, charset=None)
+                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/jpg', name=f'{user.id}.jpg', size=img_io.tell, charset=None)
                 atd.attendance_time_out_location = location
                 atd.attendance_time_out = timezone.now()
                 atd.save()
@@ -147,7 +147,7 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='PNG')
+                img.save(img_io, format='jpeg')
                 atd = Attendance.objects.create(user=user, date=datetime.today().date(), attendance_time_in_location=location)
                 return JsonResponse({"status": "success", "message": "Attendance in marked successfully"}, status=200)
             return JsonResponse({"status": "img not present"}, status=400)
