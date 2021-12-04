@@ -32,6 +32,7 @@ from django.utils import timezone
 from salary.models import Payout
 
 def decodeUserImage(data):
+    
     try:
         data = base64.b64decode(data.split(',')[1])
         buf = io.BytesIO(data)
@@ -127,9 +128,9 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='PNG')
+                img.save(img_io, format='JPG')
                 atd = todays_attendance[0]
-                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{user.id}.png', size=img_io.tell, charset=None)
+                atd.attendance_time_out_selfie = InMemoryUploadedFile(img_io, field_name=None, content_type='image/jpg', name=f'{user.id}.jpg', size=img_io.tell, charset=None)
                 atd.attendance_time_out_location = location
                 atd.attendance_time_out = timezone.now()
                 atd.save()
@@ -147,7 +148,7 @@ class AttendanceCRUD(APIView):
             img = decodeUserImage(b64_image_string)
             if img:
                 img_io = io.BytesIO()
-                img.save(img_io, format='PNG')
+                img.save(img_io, format='JPG')
                 atd = Attendance.objects.create(user=user, date=datetime.today().date(), attendance_time_in_location=location)
                 return JsonResponse({"status": "success", "message": "Attendance in marked successfully"}, status=200)
             return JsonResponse({"status": "img not present"}, status=400)

@@ -93,9 +93,9 @@ export default function App(){
       <Stack.Navigator
         screenOptions={{headerShown : false}}
       >
-        <Stack.Screen name="Main" component={MainScreens}/>
 
         <Stack.Screen name="Auth" component={GAuth}/>
+        <Stack.Screen name="Main" component={MainScreens}/>
 
 
 

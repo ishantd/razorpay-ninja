@@ -130,33 +130,42 @@ const Profile = (props) => {
             // console.error(base64)
             console.log(img)
             let promises  = [];
-            const accountProfile = await axiosY({
-                url : '/accounts/profiles/',
-                method : 'post',
-                data : {
-                    phone : phone,
-                    role : 'emp',
-                    profile_photo : img
-                }
-            })
+            if (img && phone){
+                const accountProfile = await axiosY({
+                    url : '/accounts/profiles/',
+                    method : 'post',
+                    data : {
+                        phone : phone,
+                        role : 'emp',
+                        profile_photo : img
+                    }
+                })
+            }
             console.log(accountProfile.data)
-            const bank = await axiosY({
-                url : '/accounts/bank-account/',
-                method : 'post',
-                data : {
-                    account_number : account,
-                    ifsc : ifsc,
-                    account_holder : accountHolder
-                }
-            }) 
 
-            const shop = await axiosY({
-                url : '/accounts/join-shop/',
-                method : 'post',
-                data : {
-                    shop_code : shopCode
-                }
-            })
+
+            if (ifsc && account && accountHolder){
+                const bank = await axiosY({
+                    url : '/accounts/bank-account/',
+                    method : 'post',
+                    data : {
+                        account_number : account,
+                        ifsc : ifsc,
+                        account_holder : accountHolder
+                    }
+                }) 
+            }
+
+
+            if (shopCode){
+                const shop = await axiosY({
+                    url : '/accounts/join-shop/',
+                    method : 'post',
+                    data : {
+                        shop_code : shopCode
+                    }
+                })
+            }
             // promises = [accountProfile, bank, shop]
 
 
