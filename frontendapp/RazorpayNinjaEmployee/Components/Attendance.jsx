@@ -41,6 +41,8 @@ const Attendance = (props) => {
         Roboto_700Bold,
     });
 
+    const [present, setDaysPresent] = useState(0)
+
     const [loading, setLoading] = useState(false);
     const [pageLoad, setPageLoad] = useState(false)
     const chartConfig = {
@@ -92,7 +94,6 @@ const Attendance = (props) => {
             const id = await axiosY.get('/auth/user/');
             const response = await axiosY.get(`/attendance/?user_id=${id.data.pk}`);
             const attendances = response.data.attendances
-           
             setMarkedDates({...attendances})
             setPageLoad(false)
             
@@ -226,6 +227,8 @@ const Attendance = (props) => {
                     minDate = {firstDay}
                     maxDate = {lastDay}
                     markedDates = {markedDates}
+                    disableArrowLeft ={true}
+                    disableArrowRight ={true}
                 />
                 </View>
             </View>
@@ -249,9 +252,7 @@ const Attendance = (props) => {
                     >Attendance Percentage</Text>
                     </View>
                     <View style={classes.card4}>
-                        <Text
-                            style={classes.textBubblePositive}
-                        >Days Present : 8</Text>
+                        
                         <TouchableWithoutFeedback 
 
                         onPress={MarkAbsent}
