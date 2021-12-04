@@ -46,6 +46,15 @@ class ProcessAttendance:
         distance = int(haversine((in_location.latitude, in_location.longitude), (out_location.latitude, out_location.longitude), unit=Unit.METERS))
         return distance <= settings.MAX_DISTANCE
 
+    def get_distance(self):
+        """
+        Returns the distance between the employee's location
+        """
+        in_location = self.attendance.attendance_time_in_location
+        out_location = self.attendance.attendance_time_out_location
+        distance = int(haversine((in_location.latitude, in_location.longitude), (out_location.latitude, out_location.longitude), unit=Unit.KILOMETERS))
+        return distance
+
 def compare_faces_for_checkin(target, source):
     response = client.compare_faces(
     SourceImage={
