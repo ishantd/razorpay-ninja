@@ -78,7 +78,6 @@ class RazorpayX:
                 }
                 
                 response = requests.post(self.payout_url, auth=self.auth, headers=self.headers, data=json.dumps(data))
-                print(response.status_code, response.json())
                 if response.status_code == 200:
                     payout_txn = PayoutTransaction.objects.create(
                         profile=self.user_profile,
