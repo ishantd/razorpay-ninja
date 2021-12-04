@@ -64,19 +64,20 @@ class AttendanceCRUD(APIView):
         if not employee_id and profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
         start_of_month = datetime.date.today().replace(day=1)
-        attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
         data = {"status": "success", "attendances": []}
-        for attendance in attendances:
-            atd = {
-                attendance.date.strftime("%Y-%m-%d"): {
-                    'selectedColor': '#2CDD93'
-                    if (attendance.verified_face and attendance.verified_location)
-                    else '#FF9700',
-                    'selected': True,
+        if employee_id:
+            attendances = Attendance.objects.filter(user__id=employee_id, date__gte=start_of_month)
+            for attendance in attendances:
+                atd = {
+                    attendance.date.strftime("%Y-%m-%d"): {
+                        'selectedColor': '#2CDD93'
+                        if (attendance.verified_face and attendance.verified_location)
+                        else '#FF9700',
+                        'selected': True,
+                    }
                 }
-            }
 
-            data["attendances"].append(atd)
+                data["attendances"].append(atd)
         if not employee_id:
             profiles = Profile.objects.filter(role='emp', shop=shop)
             data["employee_data"] = []
