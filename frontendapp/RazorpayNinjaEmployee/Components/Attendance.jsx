@@ -6,7 +6,6 @@ import Constants from 'expo-constants'
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker'
 
-
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import {
     ProgressChart,
@@ -48,7 +47,37 @@ const Attendance = (props) => {
         color: (opacity = 1) => `rgb(16,36,97,${opacity})`
     }
 
-  
+
+    const [img, setImg ] = useState(null)
+
+    const getImgPermission = async () => {
+      try{
+          if (Platform.OS !== 'web') {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+              alert('Sorry, we need camera roll permissions to make this work!');
+            }
+          }
+      }
+      catch(err){
+          console.log(err)
+      }
+        
+    }
+
+    const pickImage = async () => {
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+        base64 : true
+      });
+      // console.error(result)
+      if (!result.cancelled) {
+          setImage(result.uri);
+        }
+    }
 
     const getRandomUser =  async () => {
         
@@ -85,6 +114,7 @@ const Attendance = (props) => {
 
     useEffect(()=>{
         getLocation()
+        getImgPermission()
     },[])
 
     const data = [0.4]
@@ -157,7 +187,7 @@ const Attendance = (props) => {
                         >Days Absent : 12</Text>
                         <TouchableWithoutFeedback 
 
-                            onPress={() => props.navigation.navigate("CheckAttendance")}
+                            onPress={pickImage}
                         >
                             <Text style={classes.mark}>Mark Today</Text>
                         </TouchableWithoutFeedback>

@@ -57,7 +57,12 @@ const Profile = (props) => {
     const [shopCode, setShopCode] = useState();
     const [accountHolder, setAccountHolder] = useState()
     const [img, setImage] = useState(null);
-    
+    const [visible, setVisible] = React.useState(false);
+
+    const onToggleSnackBar = () => setVisible(!visible);
+  
+    const onDismissSnackBar = () => setVisible(false);
+
     const getImgPermission = async () => {
         try{
             if (Platform.OS !== 'web') {
@@ -161,10 +166,11 @@ const Profile = (props) => {
             })
             // promises = [accountProfile, bank, shop]
 
-            // const res = await Promise.all(promises);
-            // console.log(res)
-            // onToggleSnackBar()
-            props.navigation.navigate("Attendance")
+
+            
+            const res = await Promise.all(promises);
+            console.log(res)
+            onToggleSnackBar();
         }
         catch(err){
             console.log(err)
