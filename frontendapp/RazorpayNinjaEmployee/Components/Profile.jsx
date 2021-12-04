@@ -8,6 +8,7 @@ import {
     Dimensions,
     Platform,
     TouchableOpacity,
+    ActivityIndicator
 } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Constants from 'expo-constants'
@@ -62,7 +63,7 @@ const Profile = (props) => {
     const onToggleSnackBar = () => setVisible(!visible);
   
     const onDismissSnackBar = () => setVisible(false);
-
+    const [loading, setLoading] = useState(false)
     const getImgPermission = async () => {
         try{
             if (Platform.OS !== 'web') {
@@ -138,7 +139,7 @@ const Profile = (props) => {
                     data : {
                         phone : phone,
                         role : 'emp',
-                        profile_photo : img
+                        profile_photo : `data:image/jpg;base64,${img.base64}`
                     }
                 })
             }
