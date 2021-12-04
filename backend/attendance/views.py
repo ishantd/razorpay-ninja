@@ -57,11 +57,12 @@ class AttendanceCRUD(APIView):
         employee_id = request.query_params.get('employee_id', False)
         user = request.user
         profile = Profile.objects.filter(user_id=user)
-        profile = profile[0] if profile.exists() else None
-        if not profile:
+        user_profile = profile[0] if profile.exists() else None
+        if not user_profile:
             return JsonResponse({'status': 'error'}, status=400)
-        shop = profile.emp_in_shop
-        if not employee_id and profile.role == 'emp':
+        shop = user_profile.emp_in_shop
+        print(type(shop))
+        if not employee_id and user_profile.role == 'emp':
             return JsonResponse({"status": "error", "message": "Employee id is required"}, status=400)
         start_of_month = datetime.today().date().replace(day=1)
         data = {"status": "success", "attendances": []}
@@ -79,15 +80,22 @@ class AttendanceCRUD(APIView):
 
                 data["attendances"].append(atd)
         if not employee_id:
-            profiles = Profile.objects.filter(role='emp', shop=shop)
+            profiles = Profile.objects.filter(shop=shop)
+            p = Profile.objects.filter(role='emp')
+            for ps in p:
+                print(ps.emp_in_shop)
+            print(p)
+            print(profiles)
             data["employee_data"] = []
             for emp in profiles:
-                payout, payout_created = Payout.objects.get_or_create(profile=emp)
+                payout, payout_created = Payout.objects.get_or_create(employee_id=emp)
                 data["employee_data"].append({
                     "name": f'{emp.user_id.first_name} {emp.user_id.last_name}',
                     "user_id": emp.user_id.id,
+                    "role": emp.role,
+                    "shop": model_to_dict(emp.emp_in_shop),
                     "emp_id": emp.id,
-                    "profile_photo": emp.profile_photo.url if emp.profile_photo else None,
+                    "profile_photo": emp.profile_picture.url if emp.profile_picture else None,
                     "payout": model_to_dict(payout) if not payout_created else None})
         return JsonResponse(data, status=200)
         
