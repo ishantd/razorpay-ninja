@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Constants from 'expo-constants';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
 
 function EmployeeCard (props) {
@@ -25,6 +25,7 @@ function EmployeeCard (props) {
 function Employees (props) {
     const navigation = useNavigation();
     const [employees, setEmployees] = useState([]);
+    const focused = useIsFocused();
 
     const getEmployees = () => {
         const requestOptions = {
@@ -37,6 +38,10 @@ function Employees (props) {
     useEffect(() => {
         getEmployees();
     }, []);
+
+    useEffect(() => {
+        if (focused) getEmployees();
+    }, [focused]);
 
     return (
         <ScrollView style={styles.page}>

@@ -29,7 +29,15 @@ function LoginPage (props) {
                 url : '/accounts/auth/google/',
                 data : { access_token : result.accessToken }
             }
-            axiosRequestAuthInstance(requestOptions).then((response) => { storeData(response.data.key); navigation.navigate('ShopOnboarding') }).catch((error) => { console.error(error); });
+            axiosRequestAuthInstance(requestOptions).then((response) => { storeData(response.data.key).then(() => {
+                const requestOptions = {
+                    method : 'get',
+                    url : '/accounts/shop/',
+                }
+                axiosAuthorizedInstance(requestOptions).then((response) => {
+                    console.log(response.data);
+                }).catch((error) => { console.log(error); })
+            })}).catch((error) => { console.error(error); });
         } 
         catch(error) { console.error(error) }
     }

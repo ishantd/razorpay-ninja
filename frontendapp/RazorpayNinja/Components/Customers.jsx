@@ -69,7 +69,7 @@ function Customers (props) {
         Alert.alert(
             'Alert',
             `Are you sure you want to remove ${customer.name} from your customers list? This action cannot be reversed.`,
-            [ { text: "Remove", style: 'destructive', onPress: () => deleteCustomer(customer.id) }, { text: "Return" }]
+            [ { text: "Remove", style: 'destructive', onPress: () => deleteCustomer(customer.id) }, { text: "Cancel" }]
         );
     }
 

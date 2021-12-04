@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pressable, Modal, TextInput } from 'react-native'
+import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pressable, Modal, TextInput, Alert } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Constants from 'expo-constants';
 import { Calendar } from 'react-native-calendars';
 import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
+import { useNavigation } from '@react-navigation/native';
 
 function EmployeeDetails (props) {
     const [modalVisible, setModalVisible] = useState(false);
@@ -18,6 +19,8 @@ function EmployeeDetails (props) {
     const [marker, setMarker] = useState({});
 
     const [attendance, setAttendance] = useState([]);
+
+    const navigation = useNavigation();
 
     const getEmployees = () => {
         var newDateLocal;
@@ -62,6 +65,22 @@ function EmployeeDetails (props) {
         axiosAuthorizedInstance(requestOptions).then((response) => { console.log(response.data); setModalVisible(false); }).catch((error) => { console.error(error) });
     }
 
+    const deleteEmployee = () => {
+        const requestOptions = {
+            method : 'delete',
+            url : `/accounts/profiles/?user_id=${props.route.params.id}`,
+        }
+        axiosAuthorizedInstance(requestOptions).then((response) => { navigation.navigate('Employee'); }).catch((error) => { console.error(error) });
+    }
+
+    const triggerDeleteAlert = () => {
+        Alert.alert(
+            'Alert',
+            `Are you sure you want to remove ${data.employee_data.name} from your employees list? This action cannot be reversed.`,
+            [ { text: "Remove", style: 'destructive', onPress: () => deleteEmployee() }, { text: "Cancel" }]
+        );
+    }
+
     return (
         data && attendance ?
         <ScrollView style={styles.page}>
@@ -87,7 +106,7 @@ function EmployeeDetails (props) {
                 <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
                     <Text style={styles.buttonText}>Edit Payout Details</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed}>
+                <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed} onPress={() => triggerDeleteAlert()}>
                     <Text style={styles.buttonText}>Remove Employee</Text>
                 </TouchableOpacity>
             </View>

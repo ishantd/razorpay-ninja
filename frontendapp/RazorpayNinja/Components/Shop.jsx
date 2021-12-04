@@ -3,26 +3,41 @@ import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pr
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Calendar } from 'react-native-calendars';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logOutAsync } from 'expo-google-app-auth';
+import { useNavigation } from '@react-navigation/native';
+import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
 
-//const link = 'https://www.uia.no/var/uia/storage/images/media/images/2021-nyhetsbilder-1-vaar/qr-code-1500-q/2018792-1-nor-NO/qr-code-1500-q_fullwidth.jpg';
+const removeData = async (key) => {
+    await AsyncStorage.removeItem(key);
+}
 
 function Shop (props) {
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalQRVisible, setModalQRVisible] = useState(false);
 
     const [shopData, setShopData] = useState();
     const [addressData, setAddressData] = useState();
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         async function fetchValue() {    
             const shop = await AsyncStorage.getItem('shop');
             const shopJSON = JSON.parse(shop);
+            console.log(shopJSON);
             setShopData(shopJSON);
             setAddressData(shopJSON.address_string.split('\n'));
         }
 
         fetchValue();
     }, []);
+
+    const logOut = () => {
+        const requestOptions = {
+            method : 'post',
+            url : '/auth/logout/',
+        }
+        axiosAuthorizedInstance(requestOptions).then((response) => { removeData('key').then(() => removeData('shop').then(() => navigation.push('LoginScreen'))) }).catch((error) => { console.error(error) });
+    }
 
     return (
         shopData && addressData ?
@@ -31,7 +46,6 @@ function Shop (props) {
                 <View style={styles.headerImage}/>
                 <View style={styles.headerText}>
                     <Text style={styles.headerTextName}>{shopData.name}</Text>
-                    <Text style={styles.headerTextDetailsBold}>9876543211</Text>
                     { addressData.map((string, index) => <Text style={styles.headerTextDetails} key={index}>{string}</Text>) }
                     <Text style={styles.headerTextDetailsBold}>Shop Code - {shopData.unique_code}</Text>
                 </View>
@@ -40,10 +54,7 @@ function Shop (props) {
                 <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalVisible(true)}>
                     <Text style={styles.buttonText}>Edit Shop Details</Text>
                 </TouchableOpacity>
-                {/*}<TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setModalQRVisible(true)}>
-                    <Text style={styles.buttonText}>Generate Join QR</Text>
-                </TouchableOpacity>*/}
-                <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed}>
+                <TouchableOpacity activeOpacity={0.8} style={styles.buttonRed} onPress={() => logOut()}>
                     <Text style={styles.buttonText}>Logout</Text>
                 </TouchableOpacity>
             </View>
@@ -66,18 +77,6 @@ function Shop (props) {
                     </View>
                 </View>
             </Modal>
-            {/*}<Modal animationType='fade' transparent={true} visible={modalQRVisible}>
-                <View style={modalStyles.centeredView}>
-                    <View style={modalStyles.modalView}>
-                        <Image source={{ uri: link }} resizeMode='contain' resizeMethod='scale' style={modalStyles.qrImage}/>
-                        <View style={modalStyles.buttonsContainer}>
-                            <TouchableOpacity activeOpacity={0.8} style={modalStyles.button} onPress={() => setModalQRVisible(false)}>
-                                <Text style={styles.buttonText}>Dismiss</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>*/}
         </View> : null
     );
 }
