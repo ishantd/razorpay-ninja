@@ -6,12 +6,14 @@ import { useNavigation } from '@react-navigation/core';
 import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
 
 function EmployeeCard (props) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     return (
         <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={() => props.onPress()}>
             <View style={styles.cardImage}/>
             <View style={styles.cardTextSection}>
                 <Text style={styles.cardTextHeading}>{props.name}</Text>
-                <Text style={styles.cardTextSubheading}>{props.subheading}</Text>
+                <Text style={styles.cardTextSubheading}>{`Next payout on ${months[(new Date().getMonth() + 1) % 12]} ${props.subheading}`}</Text>
             </View>
             <View style={styles.cardIcon}>
                 <Ionicons name={'chevron-forward'} size={24} color={'#0A6FEB'} />
@@ -22,13 +24,14 @@ function EmployeeCard (props) {
 
 function Employees (props) {
     const navigation = useNavigation();
+    const [employees, setEmployees] = useState([]);
 
     const getEmployees = () => {
         const requestOptions = {
             method : 'get',
             url : '/attendance/',
         }
-        axiosAuthorizedInstance(requestOptions).then((response) => { console.log(response.data) }).catch((error) => { console.error(error) });
+        axiosAuthorizedInstance(requestOptions).then((response) => { setEmployees(response.data.employee_data) }).catch((error) => { console.error(error) });
     }
 
     useEffect(() => {
@@ -37,10 +40,9 @@ function Employees (props) {
 
     return (
         <ScrollView style={styles.page}>
-            <EmployeeCard name={'Employee Name'} onPress={() => navigation.navigate("EmployeeDetails")} subheading={'Next payout on Jan 12'}/>
-            <EmployeeCard name={'Employee Name'} onPress={() => navigation.navigate("EmployeeDetails")} subheading={'Next payout on Jan 12'}/>
-            <EmployeeCard name={'Employee Name'} onPress={() => navigation.navigate("EmployeeDetails")} subheading={'Next payout on Jan 12'}/>
-            <EmployeeCard name={'Employee Name'} onPress={() => navigation.navigate("EmployeeDetails")} subheading={'Next payout on Jan 12'}/>
+            {
+                employees ? employees.map((employee, index) => { return <EmployeeCard name={employee.name} photo={employee.profile_photo} subheading={employee.payout.date_of_every_month} onPress={() => navigation.navigate('EmployeeDetails', { id: employee.user_id })} key={index}/> })  : null
+            }
         </ScrollView>
     );
 }

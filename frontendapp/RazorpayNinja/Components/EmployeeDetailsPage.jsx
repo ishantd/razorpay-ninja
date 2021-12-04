@@ -3,27 +3,77 @@ import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pr
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Constants from 'expo-constants';
 import { Calendar } from 'react-native-calendars';
+import { axiosAuthorizedInstance } from '../CustomAxios/customAxios';
 
 function EmployeeDetails (props) {
     const [modalVisible, setModalVisible] = useState(false);
+    const [data, setData] = useState();
+
+    const [newDate, setNewDate] = useState();
+    const [newAmount, setNewAmount] = useState();
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const [nextMonth, setNextMonth] = useState(false);
+    const [marker, setMarker] = useState({});
+
+    const [attendance, setAttendance] = useState([]);
+
+    const getEmployees = () => {
+        var newDateLocal;
+        
+        const requestOptions = {
+            method : 'get',
+            url : `/attendance/?user_id=${props.route.params.id}`,
+        }
+        axiosAuthorizedInstance(requestOptions)
+        .then((response) => { setAttendance(response.data.attendances); setData(response.data); setNewAmount(response.data.employee_data.payout.amount / 100); setNewDate(response.data.employee_data.payout.date_of_every_month); newDateLocal = response.data.employee_data.payout.date_of_every_month;  })
+        .then(() => {
+            var now = + new Date();
+            now += 2592000000;
+            var nextMonth = new Date(now);
+            setNextMonth(nextMonth);
+
+            var date = nextMonth.getFullYear() + '-' + (nextMonth.getMonth() + 1).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + '-' + newDateLocal.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
+            var markerLocal = {};
+            markerLocal[date] = { selectedColor: '#0A6FEB', selected: true };
+            setMarker(markerLocal);
+        })
+        .catch((error) => { console.error(error) });
+    }
+
+    useEffect(() => {
+        getEmployees();
+    }, []);
+
+    const updateMarker = (date) => {
+        var markerLocal = {};
+        markerLocal[date.dateString] = { selectedColor: '#0A6FEB', selected: true };
+        setMarker(markerLocal);
+        setNewDate(date.day);
+    }
+
+    const updatePayouts = () => {
+        const requestOptions = {
+            method : 'post',
+            url : `/salary/payout/`,
+            data: { user_id: props.route.params.id, amount: newAmount * 100, date: newDate }
+        }
+        axiosAuthorizedInstance(requestOptions).then((response) => { console.log(response.data); setModalVisible(false); }).catch((error) => { console.error(error) });
+    }
 
     return (
+        data && attendance ?
         <ScrollView style={styles.page}>
             <View style={styles.header}>
                 <View style={styles.headerImage}/>
                 <View style={styles.headerText}>
-                    <Text style={styles.headerTextName}>Employee Name</Text>
-                    <Text style={styles.headerTextDetails}>Next payout of 10,000₹ on Jan 12</Text>
+                    <Text style={styles.headerTextName}>{data.employee_data.name}</Text>
+                    <Text style={styles.headerTextDetails}>Next payout of {newAmount}₹ on {months[(new Date().getMonth() + 1) % 12]} {newDate}</Text>
                 </View>
             </View>
             <Calendar onDayPress={(day) => {console.log('selected day', day)}} onDayLongPress={(day) => {console.log('selected day', day)}}
-            markedDates={{
-              '2021-12-01': {selectedColor: '#2CDD93', selected: true},
-              '2021-12-22': {selectedColor: '#2CDD93', selected: true},
-              '2021-12-23': {selectedColor: '#2CDD93', selected: true},
-              '2021-12-24': {selectedColor: '#FF9700', selected: true},
-              '2021-12-25': {selectedColor: '#D44333', selected: true}
-            }}
+            markedDates={attendance}
             theme={{
                 textDayFontWeight: '600',
                 textMonthFontWeight: 'bold',
@@ -44,11 +94,8 @@ function EmployeeDetails (props) {
             <Modal animationType='fade' transparent={true} visible={modalVisible}>
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
-                        <Calendar onDayPress={(day) => {console.log('selected day', day)}}
-                        markedDates={{
-                          '2022-01-12': {selectedColor: '#0A6FEB', selected: true},
-                        }}
-                        current={'2022-01-01'}
+                        <Calendar onDayPress={(day) => updateMarker(day)}
+                        markedDates={marker}
                         theme={{
                             textDayFontWeight: '600',
                             textMonthFontWeight: 'bold',
@@ -57,12 +104,13 @@ function EmployeeDetails (props) {
                             textMonthFontSize: 14,
                             textDayHeaderFontSize: 14
                         }}
+                        current={nextMonth}
                         monthFormat={'MMM yyyy'} hideArrows={true} hideExtraDays={true} disableMonthChange={true} firstDay={1} disableArrowLeft={true} disableArrowRight={true}/>
                         <View style={modalStyles.inputContainer}>
-                            <TextInput keyboardType='numeric' maxLength={6} style={modalStyles.inputBox} placeholder="Salary Amount"/>
+                            <TextInput keyboardType='numeric' maxLength={6} style={modalStyles.inputBox} value={String(newAmount)} onChangeText={(amount) => setNewAmount(amount)} placeholder="Salary Amount"/>
                         </View>
                         <View style={modalStyles.buttonsContainer}>
-                            <TouchableOpacity activeOpacity={0.8} style={modalStyles.button}>
+                            <TouchableOpacity activeOpacity={0.8} style={modalStyles.button} onPress={() => updatePayouts()}>
                                 <Text style={styles.buttonText}>Save</Text>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={0.8} style={modalStyles.buttonRed} onPress={() => setModalVisible(false)}>
@@ -72,7 +120,8 @@ function EmployeeDetails (props) {
                     </View>
                 </View>
             </Modal>
-        </ScrollView>
+        </ScrollView> : 
+        null
     );
 }
 

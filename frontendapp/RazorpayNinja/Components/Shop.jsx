@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, Button, TouchableOpacity, Image, StyleSheet, ScrollView, Pressable, Modal, TextInput } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Calendar } from 'react-native-calendars';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //const link = 'https://www.uia.no/var/uia/storage/images/media/images/2021-nyhetsbilder-1-vaar/qr-code-1500-q/2018792-1-nor-NO/qr-code-1500-q_fullwidth.jpg';
 
@@ -9,16 +10,30 @@ function Shop (props) {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalQRVisible, setModalQRVisible] = useState(false);
 
+    const [shopData, setShopData] = useState();
+    const [addressData, setAddressData] = useState();
+
+    useEffect(() => {
+        async function fetchValue() {    
+            const shop = await AsyncStorage.getItem('shop');
+            const shopJSON = JSON.parse(shop);
+            setShopData(shopJSON);
+            setAddressData(shopJSON.address_string.split('\n'));
+        }
+
+        fetchValue();
+    }, []);
+
     return (
-        <ScrollView style={styles.page}>
+        shopData && addressData ?
+        <View style={styles.page}>
             <View style={styles.header}>
                 <View style={styles.headerImage}/>
                 <View style={styles.headerText}>
-                    <Text style={styles.headerTextName}>TestShop</Text>
+                    <Text style={styles.headerTextName}>{shopData.name}</Text>
                     <Text style={styles.headerTextDetailsBold}>9876543211</Text>
-                    <Text style={styles.headerTextDetails}>F - 53 Road No 2</Text>
-                    <Text style={styles.headerTextDetails}>Andrews Ganj New Delhi</Text>
-                    <Text style={styles.headerTextDetailsBold}>Shop Code - Td3aAqJk</Text>
+                    { addressData.map((string, index) => <Text style={styles.headerTextDetails} key={index}>{string}</Text>) }
+                    <Text style={styles.headerTextDetailsBold}>Shop Code - {shopData.unique_code}</Text>
                 </View>
             </View>
             <View style={styles.buttonsContainer}>
@@ -36,9 +51,8 @@ function Shop (props) {
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
                         <View style={modalStyles.inputContainer}>
-                            <TextInput keyboardType='name-phone-pad' style={modalStyles.inputBox} placeholder="Shop Name"/>
-                            <TextInput keyboardType='numeric' style={modalStyles.inputBox} placeholder="Phone Number" maxLength={10}/>
-                            <TextInput keyboardType='name-phone-pad' multiline={true} underlineColorAndroid='transparent' style={modalStyles.inputBox} placeholder="Shop Address"/>
+                            <TextInput keyboardType='name-phone-pad' style={modalStyles.inputBox} placeholder="Shop Name" value={shopData.name}/>
+                            <TextInput keyboardType='name-phone-pad' multiline={true} underlineColorAndroid='transparent' style={modalStyles.inputBox} placeholder="Shop Address" value={shopData.address_string}/>
                         </View>
                         <Text style={modalStyles.modalText}>Note: Clicking "Update Shop" will set your current location as the shop's geolocation. This is used to verify attendance. Please proceed only when you're at your shop.</Text>
                         <View style={modalStyles.buttonsContainer}>
@@ -64,14 +78,15 @@ function Shop (props) {
                     </View>
                 </View>
             </Modal>*/}
-        </ScrollView>
+        </View> : null
     );
 }
 
 const styles = StyleSheet.create({
     page: {
         backgroundColor: '#FFFFFF',
-        flex: 1
+        flex: 1,
+        justifyContent: 'flex-end',
     },
 
     header: {
@@ -184,6 +199,18 @@ const modalStyles = StyleSheet.create({
         marginHorizontal: 4,
 
         marginVertical: 8,
+    },
+
+    inputBoxInactive: {
+        borderColor: '#0A6FEB66',
+        borderRadius: 4,
+        borderWidth: 2,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        marginHorizontal: 4,
+
+        marginVertical: 8,
+        color: 'grey'
     },
 
     button: {
