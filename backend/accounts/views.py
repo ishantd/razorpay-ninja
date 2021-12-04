@@ -144,19 +144,15 @@ class EmployeeCRUD(APIView):
     
     def get(self, request, *args, **kwargs):
         profile = Profile.objects.get(user_id = request.user)
-        prof_without_pic = model_to_dict(profile)
-        prof_without_pic.pop('profile_pic')
-        
-
-        employee_id = request.query_params.get('employee_id', False)
-        if(employee_id==False):
-            shop = Shop.objects.get(owner=request.user)
-            employees = shop.employees.all().values()
-        else:
-            employees = Profile.objects.filter(employee_id=employee_id).values()
-        prof_without_pic['employees'] = list(employees)
+        data = {
+            "name": f'{profile.user_id.first_name} {profile.user_id.last_name}',
+            "phone": profile.phone,
+            "profile_photo": profile.profile_picture.url if profile.profile_picture else None,
+            "role": profile.role,
+            "shop": model_to_dict(profile.emp_in_shop) if profile.emp_in_shop else None,
+        }
             
-        return JsonResponse({"status": "ok", "data":model_to_dict(prof_without_pic) }, status=200)
+        return JsonResponse({"status": "ok", "data":data }, status=200)
 
     def delete(self, request, *args, **kwargs):
         employee_id = request.query_params.get('user_id', False)
