@@ -48,7 +48,7 @@ class PayoutCRU(APIView):
         if amount and date:
             payout, payout_created = Payout.objects.get_or_create(employee_id__user_id__id=user_id)
             payout.amount = int(amount)
-            payout.date = int(date)
+            payout.date_of_every_month = int(date)
             payout.save()
             
         return JsonResponse({"status": "success", "payout": model_to_dict(payout)}, status=200)
