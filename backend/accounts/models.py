@@ -2,7 +2,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from location_field.models.plain import PlainLocationField
 import uuid
+
+from accounts.utils import random_string
+
 
 class State(models.Model):
     unique_id = models.IntegerField(default=0)
@@ -103,6 +107,7 @@ class Profile(models.Model):
     initial_messages_captured = models.BooleanField(default=False, null=False)
     social_login = models.BooleanField(default=False)
     role = models.CharField(max_length=255, null=True, blank=True)
+    emp_in_shop = models.ForeignKey('Shop', on_delete=models.CASCADE, null=True, blank=True)
     email_verified = models.BooleanField(default=False, null=False)
     profile_progress = models.IntegerField(choices=PROGRESS_CHOICES, default=1, null=True)
     profile_complete= models.BooleanField(default=False, null=False)
@@ -122,12 +127,10 @@ class Shop(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
-    unique_code = models.CharField(max_length=255, null=True, blank=True)
-    employees = models.ManyToManyField(Profile, related_name='employees', blank=True)
+    unique_code = models.CharField(max_length=8, default=random_string, unique=True)
+    location = PlainLocationField(zoom=14, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-
 
 class EmailOTP(models.Model):
     email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
@@ -149,3 +152,14 @@ class PhoneOTP(models.Model):
 
     def __str__(self):
         return str(self.otp) + ' is sent to ' + str(self.phone)
+
+class Customer(models.Model):
+    phone_regex = RegexValidator(regex=r'^[6-9]\d{9}$', message ="Phone number must be entered in the format: '[6,7,8,9]xxxxxxxxx'. Approx 10 digits allowed.")
+    name = models.CharField(max_length=255, null=True, blank=True)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
+    location = PlainLocationField(zoom=14, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    email   = models.CharField(max_length=100, unique=False, blank=True, null=True)
+    phone       = models.CharField(validators=[phone_regex], max_length=10, null=True)
+    phone_regex = RegexValidator( regex   =r'^\+?1?\d{4,14}$', message ="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.")

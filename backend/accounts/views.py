@@ -16,9 +16,25 @@ from datetime import datetime, timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount
+from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount, Customer
 from accounts.utils import valid_phone, otp_generator
 from accounts.communication import send_otp_to_phone
+from accounts.rzpxapi import RazorpayX
+
+import json
+import base64
+import io
+from PIL import Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils import timezone
+
+def decodeUserImage(data):
+    try:
+        data = base64.b64decode(data.split(',')[1])
+        buf = io.BytesIO(data)
+        return Image.open(buf)
+    except Exception as e:
+        return None
 
 
 class GoogleLogin(SocialLoginView):
@@ -30,15 +46,25 @@ class ShopCRU(APIView):
     
     def post(self, request, *args, **kwargs):
         
-        name = request.POST.get('name', False)
-        address = request.POST.get('address', False)
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
         
         if not name and address:
             return JsonResponse({"status": "not ok"}, status=400)
         
-        address_object = Address.objects.create(**address)
-        
-        shop, shop_created = Shop.objects.get_or_create(owner=request.user, name=name, address=address_object)
+        profile = Profile.objects.get(user_id=request.user)
+        if profile.role != 'owner':
+            return JsonResponse({"status": "not owner"}, status=400)
+        shop, shop_created = Shop.objects.get_or_create(owner=profile, name=name)
+        if address:
+            address_object = Address.objects.create(**address)
+            shop.address = address_object
+        if location:
+            shop.location = location
+        profile.emp_in_shop = shop
+        profile.save()
+        shop.save()
         
         return JsonResponse({"status": "ok", "shop_data": model_to_dict(shop)}, status=200)
     
@@ -52,14 +78,47 @@ class ShopCRU(APIView):
 
         return JsonResponse({"status": "ok", "data": model_to_dict(shop)}, status=200)
 
+class JoinShop(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        
+        user = request.user
+        profile = Profile.objects.get(user_id = user)
+        
+        if profile.role != 'emp':
+            return JsonResponse({"status": "not emp"}, status=400)
+        
+        shop_code = request.data.get('shop_code', False)
+        if not shop_code:
+            return JsonResponse({"status": "not ok"}, status=400)
+        
+        shop = Shop.objects.filter(unique_code=shop_code)
+        
+        if not(shop.exists() or len(shop) > 1):
+            return JsonResponse({"status": "shop not found"}, status=400)
+        
+        profile.emp_in_shop = shop[0]
+        profile.save()
+        
+        
+        #send notification
+        
+        #verification process
+        
+        return JsonResponse({"status": "ok"}, status=200)
+
 class EmployeeCRUD(APIView):
     def post(self, request, *args, **kwargs):
                         
-        dob = request.POST.get('dob', False)
-        gender = request.POST.get('gender', False)
-        address = request.POST.get('address', False)
-        role = request.POST.get('role', False)
+        dob = request.data.get('dob', False)
+        gender = request.data.get('gender', False)
+        address = request.data.get('address', False)
+        role = request.data.get('role', False)
+        phone = request.data.get('phone', False)
+        b64_image_string = request.data.get("profile_photo", False)
         profile = Profile.objects.get(user_id = request.user)
+        if phone:
+            profile.phone = phone
         if (dob):
             profile.dob = dob
         if(role):
@@ -69,6 +128,12 @@ class EmployeeCRUD(APIView):
         if(address):
             address_object = Address.objects.create(**address)
             profile.address = address_object
+        if b64_image_string:
+            img = decodeUserImage(b64_image_string)
+            if img:
+                img_io = io.BytesIO()
+                img.save(img_io, format='PNG')
+                profile.profile_picture = InMemoryUploadedFile(img_io, field_name=None, content_type='image/png', name=f'{request.user.id}.png', size=img_io.tell, charset=None)
         profile.save()
         
         return JsonResponse({"status": "ok"}, status=200)
@@ -90,11 +155,12 @@ class EmployeeCRUD(APIView):
         return JsonResponse({"status": "ok", "data":model_to_dict(prof_without_pic) }, status=200)
 
     def delete(self, request, *args, **kwargs):
-        employee_id = request.query_params.get('employee_id', False)
+        employee_id = request.query_params.get('user_id', False)
         if(employee_id==False):
-            return JsonResponse({"status": "Employee id is required"}, status=400)
-        profile = Profile.objects.get(employee_id=employee_id)
-        profile.delete()
+            return JsonResponse({"status": "User id is required"}, status=400)
+        profile = Profile.objects.get(user_id__id=employee_id)
+        profile.shop = None
+        profile.save()
         return JsonResponse({"status": "ok"}, status=200)
     
 
@@ -224,7 +290,6 @@ class UpdateAndVerifyBankAccount(APIView):
         
         if account_number and ifsc:
             bank_obj = Bank.objects.filter(ifsc=ifsc)
-            print(bank_obj)
             if bank_obj.exists() and len(bank_obj) == 1:
                 bank_obj = Bank.objects.get(ifsc=ifsc)
                 user_bank_account, user_bank_account_created = UserBankAccount.objects.get_or_create(
@@ -235,8 +300,14 @@ class UpdateAndVerifyBankAccount(APIView):
                 user_bank_account.verified = True
                 user_bank_account.verified_timestamp = datetime.now()
                 user_bank_account.save()
+                r = RazorpayX(user_bank_account)
+                payout_data = r.init_user_for_payouts()
+                if payout_data:
+                    profile.razorpay_contact_id = payout_data['contact_id']
+                    profile.razorpay_fund_account_id = payout_data['fund_account_id']
                 profile.save()
                 return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_obj)}, status=200)
+        
         return JsonResponse({"status": "bad input"}, status=400)
     
     def get(self, request, *args, **kwargs):
@@ -244,3 +315,59 @@ class UpdateAndVerifyBankAccount(APIView):
         if bank_account and len(bank_account) == 1:
             return JsonResponse({"status": "success", "bank_details": model_to_dict(bank_account[0])}, status=200)
         return JsonResponse({"status": "bad input"}, status=400)
+
+
+class CustomerCRUD(APIView):
+    def post(self, request, *args, **kwargs):
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.create(
+                name=name, address=address, location=location, email=email, phone=phone)     
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+
+    def get(self, request, *args, **kwargs):
+        customers = Customer.objects.all()
+        return JsonResponse({"status": "success", "customers": [model_to_dict(customer) for customer in customers]}, status=200)
+    
+    def put(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        name = request.data.get('name', False)
+        address = request.data.get('address', False)
+        location = request.data.get('location', False)
+        email = request.data.get('email', False)
+        phone = request.data.get('phone', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            if name:
+                customer.name = name
+            if address:
+                customer.address = address
+            if location:
+                customer.location = location
+            if email:
+                customer.email = email
+            if phone:
+                customer.phone = phone
+            customer.save()
+            return JsonResponse({"status": "success", "customer": model_to_dict(customer)}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    def delete(self, request, *args, **kwargs):
+        customer_id = request.data.get('customer_id', False)
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            customer.delete()
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "bad input"}, status=400)
+    
+    
+        
+        

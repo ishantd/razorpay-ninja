@@ -1,3 +1,5 @@
 from django.contrib import admin
+from salary.models import Payout, PayoutTransaction
 
-# Register your models here.
+admin.site.register(Payout)
+admin.site.register(PayoutTransaction)
