@@ -17,7 +17,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from accounts.models import Address, Shop, Profile, PhoneOTP, Bank, UserBankAccount, Customer
-from accounts.utils import valid_phone, otp_generator
+from accounts.utils import valid_phone, otp_generator, send_sms
 from accounts.communication import send_otp_to_phone
 from accounts.rzpxapi import RazorpayX
 
@@ -337,13 +337,15 @@ class UpdateAndVerifyBankAccount(APIView):
 
 class CustomerCRUD(APIView):
     def post(self, request, *args, **kwargs):
+        user = request.user
+        profile = Profile.objects.get(user_id=user)
         name = request.data.get('name', False)
         address = request.data.get('address', False)
         location = request.data.get('location', False)
         email = request.data.get('email', False)
         phone = request.data.get('phone', False)
         try:
-            customer = Customer.objects.create(name = name)
+            customer = Customer.objects.create(name = name, shop=profile.emp_in_shop)
             if address:
                 customer.address = address
             if location:
@@ -396,5 +398,12 @@ class CustomerCRUD(APIView):
             return JsonResponse({"status": "bad input"}, status=400)
     
     
-        
-        
+class CustomerBroadcast(APIView):
+    
+    def post(self, request, *args, **kwargs):
+        message = request.data.get('message', False)
+
+        for customer in Customer.objects.filter(shop=request.user.profile.emp_in_shop):
+            if customer.phone:
+                send_sms(customer.phone, message)
+        return JsonResponse({"status": "success"}, status=200)

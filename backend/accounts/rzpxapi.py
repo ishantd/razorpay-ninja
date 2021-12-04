@@ -71,7 +71,7 @@ class RazorpayX:
                 data = {
                     "account_number": settings.RAZORPAY_ACCOUNT_NUMBER,
                     "fund_account_id": self.user_profile.razorpay_fund_account_id,
-                    "amount": payout.amount*100,
+                    "amount": payout.amount,
                     "currency": "INR",
                     "mode": "IMPS",
                     "purpose": "salary"

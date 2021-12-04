@@ -29,7 +29,7 @@ class PayoutCRU(APIView):
         user_id = request.query_params.get('user_id', False)
         user = request.user if not user_id else User.objects.get(id=user_id)
         
-        profile = Profile.objects.get(user=user)
+        profile = Profile.objects.get(user_id=user)
         
         payout = Payout.objects.get(employee_id=profile)
         payout_txns = PayoutTransaction.objects.filter(payout=payout).values()
@@ -47,8 +47,8 @@ class PayoutCRU(APIView):
         
         if amount and date:
             payout, payout_created = Payout.objects.get_or_create(employee_id__user_id__id=user_id)
-            payout.amount = int(amount) * 100
-            payout.date = int(date)
+            payout.amount = int(amount)
+            payout.date_of_every_month = int(date)
             payout.save()
             
         return JsonResponse({"status": "success", "payout": model_to_dict(payout)}, status=200)

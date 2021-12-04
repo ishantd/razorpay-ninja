@@ -60,16 +60,16 @@ def compare_two_geocodes(original, new):
     distance = int(haversine(original, new))
     return distance
 
-
-
-
-client = boto3.client(
-    'rekognition',
-    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    region_name=settings.AWS_DEFAULT_REGION_NAME
-)
-
-def compare_faces_for_checkin(target, source):
-    
-    return True 
+def send_sms(phone, message):
+    if settings.SEND_OTP:
+        client = boto3.client(
+            "sns",
+            aws_access_key_id=settings.AWS_SNS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SNS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_DEFAULT_REGION_NAME
+        )
+        client.publish(
+            PhoneNumber=f"+91{phone}",
+            Message=message
+        )
+    return True

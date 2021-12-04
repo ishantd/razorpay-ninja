@@ -159,6 +159,7 @@ class PhoneOTP(models.Model):
 
 class Customer(models.Model):
     phone_regex = RegexValidator(regex=r'^[6-9]\d{9}$', message ="Phone number must be entered in the format: '[6,7,8,9]xxxxxxxxx'. Approx 10 digits allowed.")
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     location = PlainLocationField(zoom=14, null=True, blank=True)
